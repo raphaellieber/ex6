@@ -24,12 +24,14 @@ public class CorrectnessChecker {
     private static final String CHAR = "char";
 
 
+
+
     /**
      * A function that checks the var name correctness of a given name
      * @param name represents the given name
      * @return ture if correct, false otherwise
      */
-    public static boolean checkVarName(String name) {return name.matches(VAR_NAME); }
+    public boolean checkVarName(String name) {return name.matches(VAR_NAME); }
 
     /**
      * A function that checks the value correctness depends on a type
@@ -37,7 +39,7 @@ public class CorrectnessChecker {
      * @param value represents the value
      * @return true if correct, false otherwise (as well if the given type don't match)
      */
-    public static boolean checkValue(String type, String value) {
+    public boolean checkValue(String type, String value) {
 
         switch (type){
             case INT: return value.matches(INT_VALUE);

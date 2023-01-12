@@ -13,10 +13,20 @@ public class Sjavac {
         try {
             FileReader fileReader = new FileReader(filePath);  // todo need to close the file some when
             BufferedReader bufferedReader = new BufferedReader(fileReader);
+
+            // todo need to initialize a tokenizer
+            CorrectnessChecker correctnessChecker = new CorrectnessChecker();
+            VarTable varTable = new VarTable();
+
+            CompilationEngine compilationEngine = new CompilationEngine(tokenizer, correctnessChecker,
+                    varTable);
+
+
         } catch (IOException e) {
             System.out.println("File was not found or can't be open");
             return IO_ERROR;
         }
+
         return SUCCESS;
     }
 

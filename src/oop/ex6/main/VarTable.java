@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-public class VarTables {
+public class VarTable {
     private static final String FINAL = "FINAL";
     private static final String NOT_FINAL = "NOT_FINAL";
 
@@ -26,7 +26,7 @@ public class VarTables {
 
     private int scopeInd;
 
-    VarTables(){
+    VarTable(){
         this.globalVars = new HashMap<>();
         this.scopeVars = new LinkedList<>();
         this.scopeInd = 0;
