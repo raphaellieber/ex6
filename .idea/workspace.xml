@@ -5,11 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="27397662-d302-41b9-8131-0f0e485311c3" name="Changes" comment="added classes">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/Compiler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/oop/ex6/main/Method.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/oop/ex6/main/MethodTable.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/CorrectnessChecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/CorrectnessChecker.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/Sjavac.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/Sjavac.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/VarTables.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/VarTable.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,6 +70,7 @@
       <updated>1673508840689</updated>
       <workItem from="1673508842767" duration="433000" />
       <workItem from="1673509283810" duration="558000" />
+      <workItem from="1673599970858" duration="14426000" />
     </task>
     <task id="LOCAL‎-00001" summary="added classes">
       <created>1673551477090</created>

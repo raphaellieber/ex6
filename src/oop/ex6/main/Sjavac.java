@@ -17,7 +17,6 @@ public class Sjavac {
             // todo need to initialize a tokenizer
             CorrectnessChecker correctnessChecker = new CorrectnessChecker();
             VarTable varTable = new VarTable();
-
             CompilationEngine compilationEngine = new CompilationEngine(tokenizer, correctnessChecker,
                     varTable);
 
