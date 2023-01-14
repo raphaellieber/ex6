@@ -1,5 +1,7 @@
 package oop.ex6.main;
 
+// todo should we use pattern and matcher or use the functionally of string.matches is okay??
+
 
 // TYPES = ["int", "double", "String", "boolean", "char"]
 // var name - "^(?!\d)[_]{1,}\w+|[A-Za-z]+\w*"
@@ -11,16 +13,24 @@ package oop.ex6.main;
 
 public class CorrectnessChecker {
 
+    //    private static final String VAR_NAME = "^(?!\\d)_+\\w+|[A-Za-z]+\\w*";
     private static final String VAR_NAME = "^(?!(_(?!\\w)|\\d))\\w+";
+    private static final String PARAMETERS_DELIMITER = "\\(|,\\s|\\)";
     private static final String METHOD_NAME = "^(?!(_|\\d))\\w+";
     private static final String METHOD_PARAMETERS = "\\((\\w+\\s\\w+)(,\\s\\w+\\s\\w+)*\\)";
     private static final String SINGLE_PARAMETER_DELIMITER = "\\s";
-    private static final String PARAMETERS_DELIMITER = "\\(|,\\s|\\)";
-    private static final String INT_VALUE = "^(?!\\d)_+\\w+|[A-Za-z]+\\w*";
+
+    // values regex
+    private static final String INT_VALUE = "^[-+]?\\d+";
     private static final String DOUBLE_VALUE = "^[-+]?\\d+.?\\d*|[-+]?\\d*.?\\d+";
     private static final String BOOLEAN_VALUE = "true|false|^[-+]?\\d+.?\\d*|[-+]?\\d*.?\\d+";
     private static final String STRING_VALUE = "^\"[\\w\\W]*\"";
     private static final String CHAR_VALUE = "^'[\\w\\W]'";
+
+    // line correctness regex
+    private static final String COMMENT_START = "//";
+    private static final String SPACES = "^\\s+";
+
 
     private static final String INT = "int";
     private static final String DOUBLE = "double";
@@ -31,9 +41,6 @@ public class CorrectnessChecker {
     private static final String VOID = "void";
 
 
-
-
-
     /**
      * A method that verifies whether the argument corresponds to a legal variable name (i.e. starting with letters
      * or with an underscore followed by any character).
@@ -42,10 +49,39 @@ public class CorrectnessChecker {
      */
     public boolean isLegalVarName(String name) {return name.matches(VAR_NAME); }
 
-    public boolean isLegalVarType(String varType) {
-        return varType == INT || varType == DOUBLE || varType == CHAR || varType == STRING || varType == BOOLEAN;
+    /**
+     * A function that checks the value correctness depends on a type
+     * @param type represents the type, can get: int, double, boolean, String, char
+     * @param value represents the value
+     * @return true if correct, false otherwise (as well if the given type don't match)
+     */
+    public boolean isLegalValue(String type, String value) {
+
+        switch (type){
+            case INT: return value.matches(INT_VALUE);
+            case DOUBLE: return value.matches(DOUBLE_VALUE);
+            case BOOLEAN: return value.matches(BOOLEAN_VALUE);
+            case STRING: return value.matches(STRING_VALUE);
+            case CHAR: return value.matches(CHAR_VALUE);
+        }
+
+        // if the type didn't match
+        return false;
     }
 
+    /**
+     * A method that checks the validity of a given varType
+     * @param varType represents the given var type
+     * @return return true is valid, false otherwise
+     */
+    public boolean isLegalVarType(String varType) {
+        return varType.equals(INT) | varType.equals(DOUBLE) | varType.equals(CHAR) | varType.equals(STRING) |
+                varType.equals(BOOLEAN);
+    }
+
+    public boolean lineToIgnore(String line){
+        return line.startsWith(COMMENT_START) | line.matches(SPACES);
+    }
 
     /**
      * A method that verifies whether the argument corresponds to a legal method name (i.e. starting with letters).
@@ -53,7 +89,6 @@ public class CorrectnessChecker {
      * @return true if correct, false otherwise.
      */
     public boolean isLegalMethodName(String name) {return name.matches(METHOD_NAME);}
-
 
     /**
      * A method that verifies whether the method returns a legal type.
@@ -80,27 +115,6 @@ public class CorrectnessChecker {
             }
             return true;
         }
-        return false;
-    }
-
-
-    /**
-     * A function that checks the value correctness depends on a type
-     * @param type represents the type, can get: int, double, boolean, String, char
-     * @param value represents the value
-     * @return true if correct, false otherwise (as well if the given type don't match)
-     */
-    public boolean checkValue(String type, String value) {
-
-        switch (type){
-            case INT: return value.matches(INT_VALUE);
-            case DOUBLE: return value.matches(DOUBLE_VALUE);
-            case BOOLEAN: return value.matches(BOOLEAN_VALUE);
-            case STRING: return value.matches(STRING_VALUE);
-            case CHAR: return value.matches(CHAR_VALUE);
-        }
-
-        // if the type didn't match
         return false;
     }
 

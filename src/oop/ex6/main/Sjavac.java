@@ -3,6 +3,7 @@ package oop.ex6.main;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.StringTokenizer;
 
 public class Sjavac {
     static final int SUCCESS = 0;
@@ -10,15 +11,18 @@ public class Sjavac {
     static final int IO_ERROR = 2;
 
     public static int compileFile(String filePath) {
-        try {
-            FileReader fileReader = new FileReader(filePath);  // todo need to close the file some when
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
+        try (
+            FileReader fileReader = new FileReader(filePath);
+            BufferedReader bufferedReader = new BufferedReader(fileReader)) {
 
-            // todo need to initialize a tokenizer
             CorrectnessChecker correctnessChecker = new CorrectnessChecker();
             VarTable varTable = new VarTable();
-            CompilationEngine compilationEngine = new CompilationEngine(tokenizer, correctnessChecker,
-                    varTable);
+            FunctionTable functionTable = new FunctionTable();
+
+            CompilationEngine compilationEngine = new CompilationEngine (correctnessChecker, varTable,
+                    functionTable  ,bufferedReader);
+
+            compilationEngine.compile();
 
 
         } catch (IOException e) {
@@ -29,14 +33,20 @@ public class Sjavac {
         return SUCCESS;
     }
 
-    public static int main(String[] args) {
+    public static void main(String[] args) {
+//
+//        if (args.length == 0) {
+//            System.out.println("No file path given");
+//            return FAILURE;
+//        }
+//
+//        String filePath = args[0];
+//        return compileFile(filePath);
 
-        if (args.length == 0) {
-            System.out.println("No file path given");
-            return FAILURE;
+        String str = "a=5;";
+        StringTokenizer tokenizer = new StringTokenizer(str);
+        while (tokenizer.hasMoreTokens()) {
+            System.out.println(tokenizer.nextToken());
         }
-
-        String filePath = args[0];
-        return compileFile(filePath);
     }
 }

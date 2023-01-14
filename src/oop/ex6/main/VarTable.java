@@ -1,6 +1,7 @@
 package oop.ex6.main;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -13,35 +14,39 @@ public class VarTable {
     private static final int FINAL_LOC = 0;
     private static final int TYPE_LOC = 1;
     private static final int VALUE_LOC = 2;
-    private static final int REGEX_LOC = 3;
 
     private static final String TYPE = "TYPE";
     private static final String FINAL_OR_NOT = "FINAL_OR_NOT";
     private static final String VALUE = "VALUE";
-//    private static final String REGEX = "REGEX";
 
-    // name - [FINAL/NOT, Type, Regex, Value]
-    private final HashMap<String, String[]> globalVars;
-    private final LinkedList<HashMap<String, String[]>> scopeVars;
+
+    private final LinkedList<HashMap<String, String[]>> vars;
+//    private final HashMap<String, String[]> globalVars;
 
     private int scopeInd;
 
     VarTable(){
-        this.globalVars = new HashMap<>();
-        this.scopeVars = new LinkedList<>();
+//        this.globalVars = new HashMap<>();
+
+        this.vars = new LinkedList<>();
+
+        // initializing hashmap for first scope - global scope
+        this.vars.addFirst(new HashMap<>());
         this.scopeInd = 0;
     }
 
     /**
-     * A method that checks if a var got correct type and if it is adds a var to the var tables
+     * A method that checks if a var is in the table, if not, ads it and returns true, false otherwise
      * @param name represents the name of the var
-     * @param globOrLoc a boolean that represents if a var is global/member var (true) or local (false)
      * @param finalOrNot a boolean that represents if a var is final var (true) or not (false)
      * @param type String that represents vars type
      * @param value String that represents vars value, may be null
-     * @return true upon success, false otherwise (if the var got incorrect value)
+     * @return true upon success, false otherwise
      */
-    public boolean addVar(String name, boolean globOrLoc, boolean finalOrNot, String type, String value){
+    public boolean addVar(String name, boolean finalOrNot, String type, String value){
+
+        // check if the var is already in the table at the same scope:
+        if (checkVarInCurrentScope(name)) { return false;}
 
         String[] varArray = new String[ARRAY_SIZE];
 
@@ -53,22 +58,19 @@ public class VarTable {
         varArray[TYPE_LOC] = type;
         varArray[VALUE_LOC] = value;
 
-        // if global or member var
-        if (globOrLoc) { this.globalVars.put(name, varArray);}
-
-        // if local var
-        else {
-
-            // if we are in a new scope adding new map
-            if (this.scopeVars.size() < this.scopeInd ){
-                HashMap<String, String[]> newMap = new HashMap<>();
-                this.scopeVars.addLast(newMap);
-            }
-            // inserting the varArray into the map
-            this.scopeVars.getLast().put(name, varArray);
-        }
+        // inserting into the vars table at the last scope
+        this.vars.getLast().put(name, varArray);
 
         return true;
+    }
+
+    /**
+     * private method that checks if a var is already declared in current scope
+     * @param name represents the name of the var
+     * @return true if is already declared, false otherwise
+     */
+    private boolean checkVarInCurrentScope(String name) {
+        return this.vars.getLast().containsKey(name);
     }
 
     /**
@@ -76,7 +78,7 @@ public class VarTable {
      * !!!method assumes the var is in the table and the infoType is correct!!!!
      * @param name a String that represents the vars name
      * @param infoType represents the wanted info, can get: "TYPE" "FINAL_OR_NOT" "VALUE" "REGEX"
-     * @return returns the wanted info of the var from the tables
+     * @return returns the wanted info of the var from the table
      */
     public String getVarInfo (String name, String infoType) {
 
@@ -84,19 +86,14 @@ public class VarTable {
         if (infoType.equals(TYPE)) { inVarLocation = TYPE_LOC;}
         if (infoType.equals(FINAL_OR_NOT)) { inVarLocation = FINAL_LOC;}
         if (infoType.equals(VALUE)) { inVarLocation = VALUE_LOC;}
-//        if (infoType.equals(REGEX)) { inVarLocation = REGEX_LOC;}
         if (inVarLocation == -1) {return null;} // should not get here! // todo maybe to raise exception??
 
-        // first checking in the local scopes
-        for (HashMap<String, String[]> map :this.scopeVars) {
-            for (Map.Entry<String, String[]> entry: map.entrySet()){
+        // checking the table in reversed order
+        Iterator<HashMap<String, String[]>> iterator = this.vars.descendingIterator();
+        while( iterator.hasNext()) {
+            for (Map.Entry<String, String[]> entry: iterator.next().entrySet()){
                 if (entry.getKey().equals(name)) { return entry.getValue()[VALUE_LOC]; }
             }
-        }
-
-        // checking in the global / members table
-        for (Map.Entry<String, String[]> entry: this.globalVars.entrySet()){
-            if (entry.getKey().equals(name)) { return entry.getValue()[VALUE_LOC]; }
         }
 
         // should not get here! // todo maybe to raise exception??
@@ -106,37 +103,62 @@ public class VarTable {
     /**
      * A method that updates the scope counter
      */
-    public void newScope() {this.scopeInd ++;}
+    public void newScope() {
+        this.scopeInd ++;
+        this.vars.addLast(new HashMap<>());
+    }
 
     /**
      * A method that updates the scope counter
      */
     public void outOfScope() {
         this.scopeInd --;
-        this.scopeVars.removeLast();
+        this.vars.removeLast();
     }
 
     /**
-     * A method that checks if a var is in the tables
+     * A method that checks if a var is in the table
      * @param name represents the name of the var
      * @return true if is, false otherwise
      */
     public boolean varDeclared(String name) {
 
-        // first checking in the local scopes
-        for (HashMap<String, String[]> map :this.scopeVars) {
+        // looking for the var in the table
+        for (HashMap<String, String[]> map :this.vars) {
             if (map.containsKey(name)) { return true;}
         }
 
-        // then checking in the global/member table
-        return this.globalVars.containsKey(name);
+        // if not found
+        return false;
     }
-}
 
-// TYPES = ["int", "double", "String", "boolean", "char"]
-// var name - "^(?!\d)[_]{1,}\w+|[A-Za-z]+\w*"
-// int value - "^[-+]{0,1}\d+"
-// double value = "^[-+]{0,1}\d+.{0,1}\d*|[-+]{0,1}\d*.{0,1}\d+"
-// boolean value = "true|false|^[-+]{0,1}\d+.{0,1}\d*|[-+]{0,1}\d*.{0,1}\d+"
-// string value = "^"[\w\W]*""
-// char Value = "^'[\w\W]{1}'"
+    /**
+     * A method that allows to set the value of the var
+     * @param name represents the var name
+     * @param value represents the given value
+     * @return true upon success(if found the var and is not final) false otherwise
+     */
+    public boolean setValue(String name, String value){
+        if (varDeclared(name)) {
+            // first checking in the local scopes
+            Iterator<HashMap<String, String[]>> iterator = this.vars.descendingIterator();
+            while (iterator.hasNext()) {
+                for (Map.Entry<String, String[]> entry : iterator.next().entrySet()) {
+                    if (entry.getKey().equals(name)) {
+
+                        // if found the var and it is a final var
+                        if (entry.getValue()[FINAL_LOC].equals(FINAL)) { return false;}
+
+                        // otherwise, updating the value
+                        entry.getValue()[VALUE_LOC] = value;
+                        return true;
+                    }
+                }
+            }
+        }
+        // if not found the var at all
+        return false;
+
+    }
+
+}
