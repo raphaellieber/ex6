@@ -1,4 +1,4 @@
-package oop.ex6.main;
+package oop.ex6.main.function.handling;
 
 public class Method {
     public static enum ReturnType {VOID, PRIMITIVE_VARIABLE, REFERENCE_VARIABLE}

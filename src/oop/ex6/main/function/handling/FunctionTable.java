@@ -1,4 +1,4 @@
-package oop.ex6.main;
+package oop.ex6.main.function.handling;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,7 +6,7 @@ import java.util.HashMap;
 public class FunctionTable {
     private final HashMap<String, ArrayList<String>> functions;
 
-    FunctionTable(){
+    public FunctionTable(){
         this.functions = new HashMap<>();
     }
 

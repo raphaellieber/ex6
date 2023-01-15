@@ -31,7 +31,6 @@ public class CorrectnessChecker {
     private static final String COMMENT_START = "//";
     private static final String SPACES = "^\\s+";
 
-
     private static final String INT = "int";
     private static final String DOUBLE = "double";
     private static final String BOOLEAN = "boolean";
@@ -55,7 +54,7 @@ public class CorrectnessChecker {
      * @param value represents the value
      * @return true if correct, false otherwise (as well if the given type don't match)
      */
-    public boolean isLegalValue(String type, String value) {
+    public  boolean isLegalValue(String type, String value) {
 
         switch (type){
             case INT: return value.matches(INT_VALUE);
@@ -74,12 +73,12 @@ public class CorrectnessChecker {
      * @param varType represents the given var type
      * @return return true is valid, false otherwise
      */
-    public boolean isLegalVarType(String varType) {
+    public  boolean isLegalVarType(String varType) {
         return varType.equals(INT) | varType.equals(DOUBLE) | varType.equals(CHAR) | varType.equals(STRING) |
                 varType.equals(BOOLEAN);
     }
 
-    public boolean lineToIgnore(String line){
+    public  boolean lineToIgnore(String line){
         return line.startsWith(COMMENT_START) | line.matches(SPACES);
     }
 
@@ -88,7 +87,7 @@ public class CorrectnessChecker {
      * @param name the method name to verify.
      * @return true if correct, false otherwise.
      */
-    public boolean isLegalMethodName(String name) {return name.matches(METHOD_NAME);}
+    public  boolean isLegalMethodName(String name) {return name.matches(METHOD_NAME);}
 
     /**
      * A method that verifies whether the method returns a legal type.
@@ -97,16 +96,16 @@ public class CorrectnessChecker {
      * @param returnType the method return type.
      * @return true if correct, false otherwise.
      */
-    public boolean isLegalMethodReturnType(String returnType) {return returnType.equals(VOID);}
+    public  boolean isLegalMethodReturnType(String returnType) {return returnType.equals(VOID);}
 
-    public boolean isLegalMethodParameter(String parameter) {
+    public  boolean isLegalMethodParameter(String parameter) {
         String[] delimitedParameter = parameter.split(SINGLE_PARAMETER_DELIMITER);
         String type = delimitedParameter[0];
         String name = delimitedParameter[1];
         return isLegalVarType(type) && isLegalVarName(name);
     }
 
-    public boolean hasLegalMethodParameters(String parameters) {
+    public  boolean hasLegalMethodParameters(String parameters) {
         if(parameters.matches(METHOD_PARAMETERS)) {
             String[] singleParameters = parameters.split(PARAMETERS_DELIMITER);
             for(String singleParameter : singleParameters) {

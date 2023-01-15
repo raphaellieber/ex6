@@ -8,7 +8,7 @@ public class Tokenizer {
     private int len;
     private String curToken;
 
-    Tokenizer(String line){
+    public Tokenizer(String line){
         this.split = line.split("\\s");
         this.inWordInd = 0;
         this.wordInd = 0;

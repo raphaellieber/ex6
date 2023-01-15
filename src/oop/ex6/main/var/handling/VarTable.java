@@ -1,4 +1,4 @@
-package oop.ex6.main;
+package oop.ex6.main.var.handling;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -6,26 +6,12 @@ import java.util.LinkedList;
 import java.util.Map;
 
 public class VarTable {
-    private static final String FINAL = "FINAL";
-    private static final String NOT_FINAL = "NOT_FINAL";
 
-    private static final int ARRAY_SIZE = 3;
-
-    private static final int FINAL_LOC = 0;
-    private static final int TYPE_LOC = 1;
-    private static final int VALUE_LOC = 2;
-
-    private static final String TYPE = "TYPE";
-    private static final String FINAL_OR_NOT = "FINAL_OR_NOT";
-    private static final String VALUE = "VALUE";
-
-
-    private final LinkedList<HashMap<String, String[]>> vars;
-//    private final HashMap<String, String[]> globalVars;
+    private final LinkedList<HashMap<String, Var>> vars;
 
     private int scopeInd;
 
-    VarTable(){
+    public VarTable(){
 //        this.globalVars = new HashMap<>();
 
         this.vars = new LinkedList<>();
@@ -48,18 +34,11 @@ public class VarTable {
         // check if the var is already in the table at the same scope:
         if (checkVarInCurrentScope(name)) { return false;}
 
-        String[] varArray = new String[ARRAY_SIZE];
-
-        // Final or not:
-        if (finalOrNot) { varArray[0] = FINAL;}
-        else { varArray[FINAL_LOC] = NOT_FINAL;}
-
-        // updating type and value
-        varArray[TYPE_LOC] = type;
-        varArray[VALUE_LOC] = value;
+        // creating the var according to the given params
+        Var var = new Var(finalOrNot, type, value);
 
         // inserting into the vars table at the last scope
-        this.vars.getLast().put(name, varArray);
+        this.vars.getLast().put(name, var);
 
         return true;
     }
@@ -75,28 +54,55 @@ public class VarTable {
 
     /**
      * A method that returns the wanted info about the var
-     * !!!method assumes the var is in the table and the infoType is correct!!!!
+     * !!!! method assumes the var is in the table !!!!
      * @param name a String that represents the vars name
-     * @param infoType represents the wanted info, can get: "TYPE" "FINAL_OR_NOT" "VALUE" "REGEX"
      * @return returns the wanted info of the var from the table
      */
-    public String getVarInfo (String name, String infoType) {
-
-        int inVarLocation = -1;
-        if (infoType.equals(TYPE)) { inVarLocation = TYPE_LOC;}
-        if (infoType.equals(FINAL_OR_NOT)) { inVarLocation = FINAL_LOC;}
-        if (infoType.equals(VALUE)) { inVarLocation = VALUE_LOC;}
-        if (inVarLocation == -1) {return null;} // should not get here! // todo maybe to raise exception??
+    public Boolean getVarFinalOrNot (String name) {
 
         // checking the table in reversed order
-        Iterator<HashMap<String, String[]>> iterator = this.vars.descendingIterator();
+        Iterator<HashMap<String, Var>> iterator = this.vars.descendingIterator();
         while( iterator.hasNext()) {
-            for (Map.Entry<String, String[]> entry: iterator.next().entrySet()){
-                if (entry.getKey().equals(name)) { return entry.getValue()[VALUE_LOC]; }
+            for (Map.Entry<String, Var> entry: iterator.next().entrySet()){
+                if (entry.getKey().equals(name)) { return entry.getValue().finalOrNot();}
             }
         }
+        return null;
+    }
 
-        // should not get here! // todo maybe to raise exception??
+    /**
+     * A method that returns the wanted info about the var
+     * !!!! method assumes the var is in the table !!!!
+     * @param name a String that represents the vars name
+     * @return returns the wanted info of the var from the table
+     */
+    public String getVarType (String name) {
+
+        // checking the table in reversed order
+        Iterator<HashMap<String, Var>> iterator = this.vars.descendingIterator();
+        while( iterator.hasNext()) {
+            for (Map.Entry<String, Var> entry: iterator.next().entrySet()){
+                if (entry.getKey().equals(name)) { return entry.getValue().getType();}
+            }
+        }
+        return null;
+    }
+
+    /**
+     * A method that returns the wanted info about the var
+     * !!!! method assumes the var is in the table !!!!
+     * @param name a String that represents the vars name
+     * @return returns the wanted info of the var from the table
+     */
+    public String getVarValue (String name) {
+
+        // checking the table in reversed order
+        Iterator<HashMap<String, Var>> iterator = this.vars.descendingIterator();
+        while( iterator.hasNext()) {
+            for (Map.Entry<String, Var> entry: iterator.next().entrySet()){
+                if (entry.getKey().equals(name)) { return entry.getValue().getValue();}
+            }
+        }
         return null;
     }
 
@@ -124,7 +130,7 @@ public class VarTable {
     public boolean varDeclared(String name) {
 
         // looking for the var in the table
-        for (HashMap<String, String[]> map :this.vars) {
+        for (HashMap<String, Var> map :this.vars) {
             if (map.containsKey(name)) { return true;}
         }
 
@@ -141,16 +147,16 @@ public class VarTable {
     public boolean setValue(String name, String value){
         if (varDeclared(name)) {
             // first checking in the local scopes
-            Iterator<HashMap<String, String[]>> iterator = this.vars.descendingIterator();
+            Iterator<HashMap<String, Var>> iterator = this.vars.descendingIterator();
             while (iterator.hasNext()) {
-                for (Map.Entry<String, String[]> entry : iterator.next().entrySet()) {
+                for (Map.Entry<String, Var> entry : iterator.next().entrySet()) {
                     if (entry.getKey().equals(name)) {
 
                         // if found the var and it is a final var
-                        if (entry.getValue()[FINAL_LOC].equals(FINAL)) { return false;}
+                        if (entry.getValue().finalOrNot()) { return false;}
 
                         // otherwise, updating the value
-                        entry.getValue()[VALUE_LOC] = value;
+                        entry.getValue().setValue(value);
                         return true;
                     }
                 }
@@ -158,7 +164,5 @@ public class VarTable {
         }
         // if not found the var at all
         return false;
-
     }
-
 }
