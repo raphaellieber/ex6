@@ -26,13 +26,20 @@ public class CompilationEngine {
     private static final String CURLY_OPEN_BRACE = "{";
     private static final String CURLY_CLOSE_BRACE = "}";
     private static final String SPACE = " ";
+    private static final String SEMICOLON = ";";
+    private static final String COMMA = ",";
+    private static final String EQUAL = "=";
     private static final String FUNC_PARAM_LST_SPLIT_REGEX = "\\s*,\\s*";
+    private static final String ALL_SPACES_REGEX = "\\s";
 
     // Exceptions messages:
-    private static final String WRONG_FUNC_NAME = "Wrong function name";
-    private static final String WRONG_AVR_NAME = "Wrong var name";
-    private static final String WRONG_TYPE = "Wrong var type";
-    private static final String WRONG_END_OF_LINE = "Wrong end of line";
+    private static final String WRONG_FUNC_NAME = "Illegal function name";
+    private static final String WRONG_VAR_NAME = "Illegal var name";
+    private static final String WRONG_VALUE = "Illegal value";
+    private static final String NO_AVR_NAME = "No var name";
+    private static final String WRONG_TYPE = "Illegal var type";
+    private static final String WRONG_END_OF_LINE = "Illegal end of line";
+    private static final String ILLEGAL_DECLARATION_LINE = "Illegal declaration line";
 
     private static final ArrayList<String> DECLARATION_TYPES = new ArrayList<>() {
         {
@@ -45,13 +52,7 @@ public class CompilationEngine {
         }
     };
 
-    private static final ArrayList<String> DECLARATION_SYMBOLS = new ArrayList<>() {
-        {
-            add("=");
-            add(";");
-            add(",");
-        }
-    };
+
 
     private final CorrectnessChecker correctnessChecker;
     private final VarTable varTable;
@@ -73,7 +74,7 @@ public class CompilationEngine {
 
     }
 
-    public void compile() throws IOException {
+    public void compile() throws IOException, SYNTAXException, VALUEException, IDENTIFIERException {
 
         String line;
 
@@ -83,17 +84,15 @@ public class CompilationEngine {
         }
     }
 
-    private void compileLine(String line){
-
-        // todo need to change the tokenizer
-        this.tokenizer = new Tokenizer(line);
-
-        while (tokenizer.hasMoreTokens()) {
+    private void compileLine(String line) throws SYNTAXException, VALUEException, IDENTIFIERException {
+        while (!line.equals("")) {
+            int firstSpace = line.indexOf(SPACE);
+            String firstWord = line.substring(0, firstSpace);
 
             String curToken = tokenizer.getCurToken();
 
             // compiling declaration line
-            if (DECLARATION_TYPES.contains(curToken)) { compileDeclaration(); }
+            if (DECLARATION_TYPES.contains(curToken)) { compileDeclaration(line); }
 
             // compiling writing of a function
             if (curToken.equals(VOID)) { compileFunction(); }
@@ -107,67 +106,84 @@ public class CompilationEngine {
 
     }
 
-    private void compileDeclaration() {
+    private void compileDeclaration(String line) throws SYNTAXException, VALUEException, IDENTIFIERException {
         boolean finalOrNot = false;
 
-        if (this.tokenizer.getCurToken().equals(FINAL)) {
+        if (line.startsWith(FINAL)) {
             finalOrNot = true;
-            if (!advanceTokenizer()) {} // todo illegal declaration line, no var name
+
+            // checking for valid line beginning (should start with final + " "+)
+            int firstSpaceInd = line.indexOf(SPACE);
+            if (firstSpaceInd == -1) {throw new SYNTAXException(ILLEGAL_DECLARATION_LINE);}
+
+            // line now should start with the name of the type
+            line = line.substring(firstSpaceInd + 1).trim();
         }
 
-        String type = this.tokenizer.getCurToken();
+        // checking validity of line beginning and end
+        int firstSpaceInd = line.indexOf(SPACE);
+        int endOfLine = line.indexOf(SEMICOLON);
 
-        compileDeclarationHelper(finalOrNot, type);
+        if (firstSpaceInd == -1 | endOfLine == -1 | !this.correctnessChecker.isLegalEndOfLine(line)) {
+            throw new SYNTAXException(ILLEGAL_DECLARATION_LINE);
+        }
+
+        // type check
+        String type = line.substring(0, firstSpaceInd);
+        if (!this.correctnessChecker.isLegalVarType(type)) {throw new SYNTAXException(WRONG_TYPE);}
+
+        line = line.substring(firstSpaceInd + 1, endOfLine);
+        line = line.replaceAll(ALL_SPACES_REGEX, "");
+        compileDeclarationParams(finalOrNot, type, line);
 
     }
 
-    private void compileDeclarationHelper(boolean finalOrNot, String type) {
-        if (!advanceTokenizer()) {} // todo illegal declaration line, no var name
+    private void compileDeclarationParams(boolean finalOrNot, String type, String line)
+            throws SYNTAXException, VALUEException, IDENTIFIERException {
 
-        String name = this.tokenizer.getCurToken();
-        if (!this.correctnessChecker.isLegalVarName(name)){} // todo illegal name
+        String[] split = line.split(COMMA);
 
-        if (!advanceTokenizer()) {} // todo illegal declaration line, no var name
+        // length should be at least one, otherwise there is no var name in declaration line
+        if (split.length < 1) {throw new SYNTAXException(NO_AVR_NAME);}
 
-        if (!DECLARATION_SYMBOLS.contains(this.tokenizer.getCurToken())) {} // todo raise exception -> illegal declaration line, illegal end of line
+        for (String str: split){
+            int equal = str.indexOf(EQUAL);
+            String value = null;
+            String name = str;
 
-        // adding the var into the table:
-        if (!this.varTable.addVar(name, finalOrNot, type, null)) {} // todo raise exception already declared
+            // str is the name of the var
+            if (equal != -1){
+                name = str.split(EQUAL)[0];
+                value = str.split(EQUAL)[1];
 
-        while (!this.tokenizer.getCurToken().equals(";")) {
-
-            if (this.tokenizer.getCurToken().equals(",")) { compileDeclarationHelper(finalOrNot, type);}
-
-            // if next token is "="
-            else {
-                if (!advanceTokenizer()) {} // todo illegal declaration line, no var name
-
-                String value = this.tokenizer.getCurToken();
-
-                if (!this.correctnessChecker.isLegalValue(type, value)) {} // todo illegal value
-
-                this.varTable.setValue(name,value);
+                // checking value
+                if (!this.correctnessChecker.isLegalValue(type, value)) {
+                    throw new VALUEException(WRONG_VALUE);
+                }
             }
+            // checking name
+            if (!this.correctnessChecker.isLegalVarName(name)) {
+                throw new IDENTIFIERException(WRONG_VAR_NAME);
+            }
+            this.varTable.addVar(name, finalOrNot, type, value);
         }
-        // has more tokens in this stage -> illegal line
-        if (!advanceTokenizer()) {} // todo illegal line
     }
 
     private void compileFunction() {}
 
     private void compileIfWhileStatement() {}
 
-    private boolean advanceTokenizer(){
-
-        // checking if can advance tokenizer
-        if (this.tokenizer.hasMoreTokens()) {
-            this.tokenizer.advance();
-            return true;
-        }
-
-        return false;
-
-    }
+//    private boolean advanceTokenizer(){
+//
+//        // checking if can advance tokenizer
+//        if (this.tokenizer.hasMoreTokens()) {
+//            this.tokenizer.advance();
+//            return true;
+//        }
+//
+//        return false;
+//
+//    }
 
     private void initiateFuncTable() throws IOException, IDENTIFIERException, SYNTAXException {
         String line;
@@ -198,11 +214,11 @@ public class CompilationEngine {
         }
     }
 
+    // todo: need to update this section according to Rephael's method class!!
     private ArrayList<String> declarationHelper(String declaration) throws IDENTIFIERException {
         // the result will be: type name
         String[] pramTypeTmp = declaration.split(FUNC_PARAM_LST_SPLIT_REGEX);
 
-        // todo: need to update this section according to function class!!
         ArrayList<String> paramType = new ArrayList<>();
         for (String s: pramTypeTmp){
 
@@ -216,7 +232,7 @@ public class CompilationEngine {
 
             // throwing exceptions for var name
             if (!this.correctnessChecker.isLegalVarName(name)) {
-                throw new IDENTIFIERException(WRONG_AVR_NAME);
+                throw new IDENTIFIERException(WRONG_VAR_NAME);
             }
             paramType.add(s);
         }

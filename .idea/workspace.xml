@@ -4,17 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="27397662-d302-41b9-8131-0f0e485311c3" name="Changes" comment="exception classes">
-      <change afterPath="$PROJECT_DIR$/src/oop/ex6/main/var/handling/Var.java" afterDir="false" />
+    <list default="true" id="27397662-d302-41b9-8131-0f0e485311c3" name="Changes" comment="added packages: varHandling and Function handling&#10;added Var class (similar to the method class)&#10;made some minor changes in the VarTable class -&gt; made it simpler&#10;added exception handling to the initiateFuncTable function">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/CorrectnessChecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/CorrectnessChecker.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/FunctionTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/function/handling/FunctionTable.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/Method.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/function/handling/Method.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/MethodTable.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/Sjavac.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/Sjavac.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/Tokenizer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/Tokenizer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/VarTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/var/handling/VarTable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/var/handling/Var.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/var/handling/Var.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -108,7 +103,14 @@
       <option name="project" value="LOCAL‎" />
       <updated>1673719322244</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL‎-00004" summary="added packages: varHandling and Function handling&#10;added Var class (similar to the method class)&#10;made some minor changes in the VarTable class -&gt; made it simpler&#10;added exception handling to the initiateFuncTable function">
+      <created>1673785226517</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL‎-00004" />
+      <option name="project" value="LOCAL‎" />
+      <updated>1673785226517</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -129,6 +131,7 @@
     <MESSAGE value="added classes" />
     <MESSAGE value="some updates" />
     <MESSAGE value="exception classes" />
-    <option name="LAST_COMMIT_MESSAGE" value="exception classes" />
+    <MESSAGE value="added packages: varHandling and Function handling&#10;added Var class (similar to the method class)&#10;made some minor changes in the VarTable class -&gt; made it simpler&#10;added exception handling to the initiateFuncTable function" />
+    <option name="LAST_COMMIT_MESSAGE" value="added packages: varHandling and Function handling&#10;added Var class (similar to the method class)&#10;made some minor changes in the VarTable class -&gt; made it simpler&#10;added exception handling to the initiateFuncTable function" />
   </component>
 </project>

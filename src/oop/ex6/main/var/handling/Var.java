@@ -2,10 +2,16 @@ package oop.ex6.main.var.handling;
 
 public class Var {
 
-    private boolean finalOrNot;
-    private String type;
+    private final boolean finalOrNot;
+    private final String type;
     private String value;
 
+    /**
+     *
+     * @param finalOrNot
+     * @param type
+     * @param value
+     */
     public Var(boolean finalOrNot, String type, String value) {
 
         this.finalOrNot = finalOrNot;

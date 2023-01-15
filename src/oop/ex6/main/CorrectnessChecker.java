@@ -30,6 +30,7 @@ public class CorrectnessChecker {
     // line correctness regex
     private static final String COMMENT_START = "//";
     private static final String SPACES = "^\\s+";
+    private static final String ONLY_END_SEMICOLON_REGEX = "^[^;]*;$";
 
     private static final String INT = "int";
     private static final String DOUBLE = "double";
@@ -115,6 +116,15 @@ public class CorrectnessChecker {
             return true;
         }
         return false;
+    }
+
+    /**
+     * A method that checks if the line ends legally - with semicolon (;) and has only one semicolon
+     * @param line represents the given line
+     * @return true if legal, false otherwise
+     */
+    public boolean isLegalEndOfLine(String line) {
+        return line.matches(ONLY_END_SEMICOLON_REGEX);
     }
 
 
