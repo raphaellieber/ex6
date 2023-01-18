@@ -7,10 +7,10 @@ public class Var {
     private String value;
 
     /**
-     *
-     * @param finalOrNot
-     * @param type
-     * @param value
+     * A constructor for a var object
+     * @param finalOrNot a boolean represents if it is final or not
+     * @param type String that represents its type
+     * @param value Stains the represents the vars value, can be null!
      */
     public Var(boolean finalOrNot, String type, String value) {
 

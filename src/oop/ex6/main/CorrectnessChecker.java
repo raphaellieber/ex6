@@ -2,6 +2,8 @@ package oop.ex6.main;
 
 // todo should we use pattern and matcher or use the functionally of string.matches is okay??
 
+//ValidityChecker
+//CorrectnessChecker
 
 // TYPES = ["int", "double", "String", "boolean", "char"]
 // var name - "^(?!\d)[_]{1,}\w+|[A-Za-z]+\w*"
@@ -31,6 +33,7 @@ public class CorrectnessChecker {
     private static final String COMMENT_START = "//";
     private static final String SPACES = "^\\s+";
     private static final String ONLY_END_SEMICOLON_REGEX = "^[^;]*;$";
+    private static final String ONLY_END_CURLY_BRACES_REGEX = "^[^{]*{$";
 
     private static final String INT = "int";
     private static final String DOUBLE = "double";
@@ -79,6 +82,11 @@ public class CorrectnessChecker {
                 varType.equals(BOOLEAN);
     }
 
+    /**
+     * A method that checks if the given line can be ignored
+     * @param line represents the given line
+     * @return true if it can be ignored, false otherwise
+     */
     public  boolean lineToIgnore(String line){
         return line.startsWith(COMMENT_START) | line.matches(SPACES);
     }
@@ -88,7 +96,7 @@ public class CorrectnessChecker {
      * @param name the method name to verify.
      * @return true if correct, false otherwise.
      */
-    public  boolean isLegalMethodName(String name) {return name.matches(METHOD_NAME);}
+    public  boolean legalMethodName(String name) {return name.matches(METHOD_NAME);}
 
     /**
      * A method that verifies whether the method returns a legal type.
@@ -99,7 +107,7 @@ public class CorrectnessChecker {
      */
     public  boolean isLegalMethodReturnType(String returnType) {return returnType.equals(VOID);}
 
-    public  boolean isLegalMethodParameter(String parameter) {
+    public  boolean legalMethodParameter(String parameter) {
         String[] delimitedParameter = parameter.split(SINGLE_PARAMETER_DELIMITER);
         String type = delimitedParameter[0];
         String name = delimitedParameter[1];
@@ -110,7 +118,7 @@ public class CorrectnessChecker {
         if(parameters.matches(METHOD_PARAMETERS)) {
             String[] singleParameters = parameters.split(PARAMETERS_DELIMITER);
             for(String singleParameter : singleParameters) {
-                if(!isLegalMethodParameter(singleParameter))
+                if(!legalMethodParameter(singleParameter))
                     return false;
             }
             return true;
@@ -123,9 +131,16 @@ public class CorrectnessChecker {
      * @param line represents the given line
      * @return true if legal, false otherwise
      */
-    public boolean isLegalEndOfLine(String line) {
+    public boolean legalEndOfLine(String line) {
         return line.matches(ONLY_END_SEMICOLON_REGEX);
     }
+
+    /**
+     * A method that checks if the line ends legally - with { and has only one { in it
+     * @param line represents the given line to check
+     * @return true upos success, false otherwise
+     */
+    public boolean legalEndOfIfWhileLine(String line) {return line.matches(ONLY_END_CURLY_BRACES_REGEX);}
 
 
 
