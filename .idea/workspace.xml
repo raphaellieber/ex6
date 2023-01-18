@@ -4,12 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="27397662-d302-41b9-8131-0f0e485311c3" name="Changes" comment="changed compileDeclaration function in CompilationEngine to more general and modular without using tokenizer at all">
+    <list default="true" id="27397662-d302-41b9-8131-0f0e485311c3" name="Changes" comment="update">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/CorrectnessChecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/CorrectnessChecker.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/Sjavac.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/Sjavac.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/var/handling/Var.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/var/handling/Var.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -117,7 +114,14 @@
       <option name="project" value="LOCAL‎" />
       <updated>1673812453363</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL‎-00006" summary="update">
+      <created>1674072896661</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL‎-00006" />
+      <option name="project" value="LOCAL‎" />
+      <updated>1674072896661</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -153,6 +157,7 @@
     <MESSAGE value="exception classes" />
     <MESSAGE value="added packages: varHandling and Function handling&#10;added Var class (similar to the method class)&#10;made some minor changes in the VarTable class -&gt; made it simpler&#10;added exception handling to the initiateFuncTable function" />
     <MESSAGE value="changed compileDeclaration function in CompilationEngine to more general and modular without using tokenizer at all" />
-    <option name="LAST_COMMIT_MESSAGE" value="changed compileDeclaration function in CompilationEngine to more general and modular without using tokenizer at all" />
+    <MESSAGE value="update" />
+    <option name="LAST_COMMIT_MESSAGE" value="update" />
   </component>
 </project>

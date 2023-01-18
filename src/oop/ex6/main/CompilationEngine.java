@@ -54,8 +54,6 @@ public class CompilationEngine {
         }
     };
 
-
-
     private final CorrectnessChecker checker;
     private final VarTable varTable;
     private final FunctionTable functionTable;
@@ -127,6 +125,7 @@ public class CompilationEngine {
         int firstSpaceInd = line.indexOf(SPACE);
         int endOfLine = line.indexOf(SEMICOLON);
 
+        // todo check if end of line can end with spaces
         if (firstSpaceInd == -1 | endOfLine == -1 | !this.checker.legalEndOfLine(line)) {
             throw new SYNTAXException(ILLEGAL_DECLARATION_LINE);
         }
@@ -164,9 +163,7 @@ public class CompilationEngine {
                 }
             }
             // checking name
-            if (!this.checker.isLegalVarName(name)) {
-                throw new IDENTIFIERException(WRONG_VAR_NAME);
-            }
+            if (!this.checker.isLegalVarName(name)) { throw new IDENTIFIERException(WRONG_VAR_NAME); }
             this.varTable.addVar(name, finalOrNot, type, value);
         }
     }
@@ -226,6 +223,7 @@ public class CompilationEngine {
 
                 // todo: need to add a basic declaration line check: checks for only one {, (, )
                 // todo otherwise those lines may be incorrect
+                // todo check if we can have spaces after ;
 
                 // dividing into 3 sections: func name, params, end of line
                 String funcName = line.substring(spaceLoc,braceStartLoc).trim();
@@ -249,6 +247,7 @@ public class CompilationEngine {
 
     // todo: need to update this section according to Rephael's method class!!
     // todo this section is already written in checker class? (hasLegalMethodParameters)
+    // todo param may be final
     private ArrayList<String> funcParamsCheck(String declaration) throws IDENTIFIERException {
         // the result will be: type name
         String[] pramTypeTmp = declaration.split(FUNC_PARAM_LST_SPLIT_REGEX);
