@@ -32,7 +32,7 @@ public class VarTable {
     public boolean addVar(String name, boolean finalOrNot, String type, String value){
 
         // check if the var is already in the table at the same scope:
-        if (checkVarInCurrentScope(name)) { return false;}
+        if (varDeclaredInCurScope(name)) { return false;}
 
         // creating the var according to the given params
         Var var = new Var(finalOrNot, type, value);
@@ -44,11 +44,11 @@ public class VarTable {
     }
 
     /**
-     * private method that checks if a var is already declared in current scope
+     * A method that checks if a var is already declared in current scope
      * @param name represents the name of the var
      * @return true if is already declared, false otherwise
      */
-    private boolean checkVarInCurrentScope(String name) {
+    public boolean varDeclaredInCurScope(String name) {
         return this.vars.getLast().containsKey(name);
     }
 

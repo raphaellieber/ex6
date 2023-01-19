@@ -4,6 +4,7 @@ import oop.ex6.main.function.handling.FunctionTable;
 import oop.ex6.main.var.handling.VarTable;
 
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -32,6 +33,12 @@ public class CompilationEngine {
     private static final String FUNC_PARAM_LST_SPLIT_REGEX = "\\s*,\\s*";
     private static final String ALL_SPACES_REGEX = "\\s";
 
+
+    private static final String RETURN_REGEX = "^\\s*return\\s*;\\s*$";
+    private static final String END_OF_SCOPE_REGEX = "^\\s*}\\s*$";
+    private static final String ASSIGNMENT_REGEX = "^.*=.*";
+    private static final String FUNCTION_CALL_REGEX = "^.*\\(.*\\).*";
+
     // Exceptions messages:
     private static final String WRONG_FUNC_NAME = "Illegal function name";
     private static final String WRONG_VAR_NAME = "Illegal var name";
@@ -42,6 +49,10 @@ public class CompilationEngine {
     private static final String ILLEGAL_DECLARATION_LINE = "Illegal declaration line";
     private static final String ILLEGAL_FUNCTION_DECLARATION = "Illegal in function - function declaration";
     private static final String ILLEGAL_IF_WHILE = "If/While declared out of function";
+    private static final String ASSIGNING_FINAL_VAR = "Illegal assignment of final var";
+    private static final String ILLEGAL_FUNCTION_CALL = "Illegal function call - probably out of function";
+    private static final String VAR_ALREADY_DECLARED = "Illegal declaration - the var with same name was" +
+            " already declared";
 
     private static final ArrayList<String> DECLARATION_KEYWORDS = new ArrayList<>() {
         {
@@ -58,25 +69,25 @@ public class CompilationEngine {
     private final VarTable varTable;
     private final FunctionTable functionTable;
     private final BufferedReader reader;
+    private final BufferedReader firstRunReader;
 
     private boolean inFuncFlag;
     private int depthCounter;
 //    private Tokenizer tokenizer;
 
-    public CompilationEngine (CorrectnessChecker checker, VarTable varTable,
-                              FunctionTable functionTable, BufferedReader reader)
+    public CompilationEngine (CorrectnessChecker checker,FunctionTable functionTable,
+                              VarTable varTable,  BufferedReader reader, BufferedReader firstRunReader)
                             throws IDENTIFIERException, IOException, SYNTAXException {
         this.checker = checker;
         this.varTable = varTable;
         this.functionTable = functionTable;
         this.reader = reader;
+        this.firstRunReader = firstRunReader;
         this.inFuncFlag = true;
         this.depthCounter = 0;
 
-        // todo problem: resetting reader may not do what we want it to do
         // Initializing the function table:
         initiateFuncTable();
-        this.reader.reset();
 
     }
 
@@ -85,25 +96,110 @@ public class CompilationEngine {
 
         while ((line = this.reader.readLine()) != null) {
             // checking if we can ignore the given line
-            if (!(this.checker.lineToIgnore(line))) {compileLine(line);}
+            if (!(this.checker.lineToIgnore(line))) {compileLine(line.trim());}
         }
     }
 
     private void compileLine(String line) throws SYNTAXException, VALUEException, IDENTIFIERException,
             IOException {
         while (!line.equals("")) {
+
             int firstSpace = line.indexOf(SPACE);
-            String firstWord = line.substring(0, firstSpace);
+            String firstWord = "";
+            if (firstSpace != -1) { firstWord = line.substring(0, firstSpace);}
 
             // compiling declaration line
             if (DECLARATION_KEYWORDS.contains(firstWord)) { compileVarDeclaration(line); }
 
             // compiling declaration of a function
-            if (firstWord.equals(VOID)) { compileFunctionDeclaration(); }
+            else {if (firstWord.equals(VOID)) { compileFunctionDeclaration(); }
 
             // if/while statement
-            if(line.startsWith(IF) | line.startsWith(WHILE)) { compileIfWhileStatement(line); }
+            else {if(line.startsWith(IF) | line.startsWith(WHILE)) { compileIfWhileStatement(line); }
+
+
+            // end of scope: '}'
+            else {if (line.matches(END_OF_SCOPE_REGEX)) {compileEndOfScope();}
+
+            // return;
+            else { if (line.matches(RETURN_REGEX)) { compileReturnStatement(); }
+
+            // assignment line (not as declaration)
+            else {if (line.matches(ASSIGNMENT_REGEX)) { compileVarAssignment(line); }
+
+            // function call
+            else {if (line.matches(FUNCTION_CALL_REGEX)) {compileFunctionCall(line);}}
+
+            }}}}}
         }
+    }
+
+    private void compileFunctionCall(String line) throws SYNTAXException {
+        // if function was called out of function
+        if (!this.inFuncFlag) { throw new SYNTAXException(ILLEGAL_FUNCTION_CALL);}
+
+        // TODO add more general check: check for only one '(', ')' and no more chars after ')' until ';' except spaces
+        // end of line check:
+        if (!this.checker.legalEndOfLine(line)){ throw new SYNTAXException(Illegal_END_OF_LINE);}
+
+        // slicing name and params list:
+        int openRoundBraces = line.indexOf(ROUND_OPEN_BRACE);
+        int closeRoundBraces = line.indexOf(ROUND_CLOSE_BRACE);
+
+        String funcName = line.substring(0, openRoundBraces).trim();
+        String paramsList = line.substring(openRoundBraces + 1, closeRoundBraces);
+
+
+
+        // calling to a function that checks the params:
+        // todo
+
+    }
+
+    private void compileReturnStatement() { }
+
+    private void compileVarAssignment(String line) throws IDENTIFIERException, VALUEException,
+            SYNTAXException {
+
+        // checking of the validity of end of line
+        if (!this.checker.legalEndOfLine(line)) { throw new SYNTAXException(Illegal_END_OF_LINE);}
+
+        line = line.replaceAll(ALL_SPACES_REGEX,"");
+        line = line.substring(0,line.length()-1);
+        String[] split = line.split(COMMA);
+
+        for (String str: split) {
+            String varName = str.split(EQUAL)[0];
+            String value = str.split(EQUAL)[1];
+
+            // checking if the var declared
+            if (!this.varTable.varDeclared(varName)) { throw new IDENTIFIERException(WRONG_VAR_NAME);}
+
+            // checking if trying to assign final var
+            boolean finalOrNot = this.varTable.getVarFinalOrNot(varName);
+            if (finalOrNot) {throw new IDENTIFIERException(ASSIGNING_FINAL_VAR); }
+
+            // checking if the vars value is legal, if not, the "value" may be another var
+            String type = this.varTable.getVarType(varName);
+            if (!this.checker.isLegalValue(type, value)) { value = setVarValueFromTable(type,value);}
+
+            //if reached here the value is legal, so we can assign it
+            this.varTable.setValue(varName,value);
+        }
+    }
+
+    /**
+     * A method that compiles the end of the scope
+     */
+    private void compileEndOfScope() {
+
+        this.varTable.outOfScope();
+
+        // out of if/while scope
+        if (this.depthCounter > 0) { this.depthCounter --;}
+
+        // out of function scope
+        else { this.inFuncFlag = false; }
     }
 
     private void compileVarDeclaration(String line) throws SYNTAXException, VALUEException,
@@ -125,7 +221,6 @@ public class CompilationEngine {
         int firstSpaceInd = line.indexOf(SPACE);
         int endOfLine = line.indexOf(SEMICOLON);
 
-        // todo check if end of line can end with spaces
         if (firstSpaceInd == -1 | endOfLine == -1 | !this.checker.legalEndOfLine(line)) {
             throw new SYNTAXException(ILLEGAL_DECLARATION_LINE);
         }
@@ -162,20 +257,27 @@ public class CompilationEngine {
                     value =  setVarValueFromTable(type, value);
                 }
             }
-            // checking name
+            // checking if the var final -> a value should not be null
+            if (finalOrNot & value == null) { throw new SYNTAXException(ILLEGAL_DECLARATION_LINE);}
+
+            // checking name and if the var with same name was already declared
             if (!this.checker.isLegalVarName(name)) { throw new IDENTIFIERException(WRONG_VAR_NAME); }
+            if (!this.varTable.varDeclaredInCurScope(name)) {throw new SYNTAXException(VAR_ALREADY_DECLARED);}
+
             this.varTable.addVar(name, finalOrNot, type, value);
         }
     }
 
     private String setVarValueFromTable(String type, String varName) throws VALUEException {
+        // checking if the var is declared, and its value isn't null
+            if (this.varTable.varDeclared(varName) &  this.varTable.getVarValue(varName) != null){
 
-        // checking if the var is declared, if it's type matches to the given one and if it was initialized
-        // if it is, returns its value
-            if (this.varTable.varDeclared(varName) & this.varTable.getVarType(varName).equals(type) &
-                this.varTable.getVarValue(varName) != null) {
-                return  this.varTable.getVarValue(varName);
+                // checking validity of the vars value
+                if (this.checker.isLegalValue(type, this.varTable.getVarValue(varName))){
+                    return  this.varTable.getVarValue(varName);
+                }
             }
+
             // otherwise throws exception - wrong value
             throw new VALUEException(WRONG_VALUE);
         }
@@ -197,7 +299,7 @@ public class CompilationEngine {
         // if / while out of function
         if (!this.inFuncFlag) { throw new SYNTAXException(ILLEGAL_IF_WHILE); }
 
-        // check if exceeded java.lang.Integer.MAX VALUE:
+        // check if exceeded java.lang.Integer.MAX_VALUE:
         // todo
 
         // todo need to add ( and ) to the check
@@ -214,16 +316,16 @@ public class CompilationEngine {
     private void initiateFuncTable() throws IOException, IDENTIFIERException, SYNTAXException {
         String line;
 
-        while ((line = this.reader.readLine()) != null) {
+        while ((line = this.firstRunReader.readLine()) != null) {
             if (line.startsWith(FUNC_DECLARATION_START)){
                 int braceStartLoc = line.indexOf(ROUND_OPEN_BRACE);
                 int braceFinishLoc = line.indexOf(ROUND_CLOSE_BRACE);
                 int spaceLoc = line.indexOf(SPACE);
 
-
-                // todo: need to add a basic declaration line check: checks for only one {, (, )
-                // todo otherwise those lines may be incorrect
-                // todo check if we can have spaces after ;
+                // checking validity of the given line
+                if (!this.checker.legalFunctionDeclarationLine(line)) {
+                    throw  new SYNTAXException(ILLEGAL_FUNCTION_DECLARATION);
+                }
 
                 // dividing into 3 sections: func name, params, end of line
                 String funcName = line.substring(spaceLoc,braceStartLoc).trim();
@@ -236,7 +338,7 @@ public class CompilationEngine {
                 }
 
                 // exception for wrong end of line
-                if (!endOfLine.equals(CURLY_OPEN_BRACE)) {throw new SYNTAXException(Illegal_END_OF_LINE);}
+//                if (!endOfLine.equals(CURLY_OPEN_BRACE)) {throw new SYNTAXException(Illegal_END_OF_LINE);}`
 
                 // dealing with param declaration:
                 ArrayList<String> paramType = funcParamsCheck(declaration);

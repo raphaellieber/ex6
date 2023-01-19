@@ -32,8 +32,9 @@ public class CorrectnessChecker {
     // line correctness regex
     private static final String COMMENT_START = "//";
     private static final String SPACES = "^\\s+";
-    private static final String ONLY_END_SEMICOLON_REGEX = "^[^;]*;$";
-    private static final String ONLY_END_CURLY_BRACES_REGEX = "^[^{]*{$";
+    private static final String ONLY_END_SEMICOLON_REGEX = "^[^;]*;\\s*$";
+    private static final String ONLY_END_CURLY_BRACES_REGEX = "^[^{]*\\{\\s*$";
+    private static final String FUNCTION_DEC_LINE_REGEX = "^.*\\(.*\\)\\s*\\{\\s*$";
 
     private static final String INT = "int";
     private static final String DOUBLE = "double";
@@ -141,6 +142,10 @@ public class CorrectnessChecker {
      * @return true upos success, false otherwise
      */
     public boolean legalEndOfIfWhileLine(String line) {return line.matches(ONLY_END_CURLY_BRACES_REGEX);}
+
+    public boolean legalFunctionDeclarationLine(String line) {
+        return line.matches(FUNCTION_DEC_LINE_REGEX);
+    }
 
 
 

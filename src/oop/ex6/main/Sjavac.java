@@ -13,27 +13,28 @@ public class Sjavac {
     static final int IO_ERROR = 2;
 
     public static int compileFile(String filePath) {
-        try (
-            FileReader fileReader = new FileReader(filePath);
-            BufferedReader bufferedReader = new BufferedReader(fileReader)) {
+        try (  FileReader fileReader = new FileReader(filePath);
+               FileReader firstRunFileReader = new FileReader(filePath);
+               BufferedReader bufferedReader = new BufferedReader(fileReader);
+               BufferedReader firstRunReader = new BufferedReader(firstRunFileReader)) {
 
             CorrectnessChecker correctnessChecker = new CorrectnessChecker();
             VarTable varTable = new VarTable();
             FunctionTable functionTable = new FunctionTable();
 
-            CompilationEngine compilationEngine = new CompilationEngine (correctnessChecker, varTable,
-                    functionTable  ,bufferedReader);
+            CompilationEngine compilationEngine = new CompilationEngine (correctnessChecker, functionTable,
+                    varTable, bufferedReader, firstRunReader);
 
             compilationEngine.compile();
         }
 
         catch (IOException e) {
-            System.out.println("File was not found or can't be open");
-            return IO_ERROR;
+            System.err.println("File was not found or can't be open");
+            return FAILURE;
         }
 
         catch (IDENTIFIERException | SYNTAXException | VALUEException e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
             return IO_ERROR;
         }
 
@@ -43,36 +44,14 @@ public class Sjavac {
     public static void main(String[] args) {
 //
 //        if (args.length == 0) {
-//            System.out.println("No file path given");
+//            System.err.println("No file path given");
 //            return FAILURE;
 //        }
 //
 //        String filePath = args[0];
 //        return compileFile(filePath);
 
-        String line = "a    ,b  =  5,c=d;       ";
-//        String[] split= str.split("\\s+|\\s+,\\s+|\\(|\\)");
-//        String[] split= str.split("\\s*(void|\\w|\\w|\\w|\\w)\\s*/g");
-//        System.out.println(split);\
-//        int braceStartLoc = line.indexOf("(");
-//        int braceFinishLoc = line.indexOf(")");
-//        int spaceLoc = line.indexOf(" ");
-
-//        String funcName = line.substring(spaceLoc,braceStartLoc).trim();
-//        String declaration = line.substring(braceStartLoc+1, braceFinishLoc);
-//        String endOfLine = line.substring(braceFinishLoc+1);
-
-//        System.out.println(funcName);
-//        System.out.println(declaration);
-//        System.out.println(endOfLine);
-
-        line = line.replaceAll("\\s", "");
-        String[] split = line.split(",");
-//        System.out.println(!line.matches(".*;$"));
-        int a = line.indexOf("k");
-        System.out.println(a);
-        for(String s:split) {
-            System.out.println(s);
-        }
+        String line = "agdgad    fg a   { {  ";
+        System.out.println(line.matches("^[^{]*\\{\\s*$"));
     }
 }
