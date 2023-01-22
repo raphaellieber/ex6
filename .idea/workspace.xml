@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6b111afd-306a-4de0-9da9-92db7b427c29" name="Changes" comment="TODO in complieIfWhile">
+    <list default="true" id="6b111afd-306a-4de0-9da9-92db7b427c29" name="Changes" comment="Corrected">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -150,7 +149,14 @@
       <option name="project" value="LOCAL" />
       <updated>1674415161496</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Corrected">
+      <created>1674426411076</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1674426411076</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -202,7 +208,8 @@
     <MESSAGE value="finished my part except function call -&gt; need to discuss some things&#10;fixed most of the todo things all over the code except in Raphael's part" />
     <MESSAGE value="Moved If/While syntax verification to CorrectnessChecker." />
     <MESSAGE value="TODO in complieIfWhile" />
-    <option name="LAST_COMMIT_MESSAGE" value="TODO in complieIfWhile" />
+    <MESSAGE value="Corrected" />
+    <option name="LAST_COMMIT_MESSAGE" value="Corrected" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
