@@ -19,7 +19,7 @@ public class CorrectnessChecker {
     // values regex
     private static final String INT_VALUE = "^[-+]?\\d+";
     private static final String DOUBLE_VALUE = "^[-+]?\\d+.?\\d*|[-+]?\\d*.?\\d+";
-    private static final String BOOLEAN_VALUE = "true|false|^[-+]?\\d+.?\\d*|[-+]?\\d*.?\\d+";
+    private static final String BOOLEAN_VALUE = "true|false|^[-+]?\\d+.?\\d*|[-+]?\\d*.?\\d+|[-+]?\\d+";
     private static final String STRING_VALUE = "^\"[\\w\\W]*\"";
     private static final String CHAR_VALUE = "^'[\\w\\W]'";
 
@@ -150,5 +150,7 @@ public class CorrectnessChecker {
 
     public boolean hasTrueFalseCondition(String condition) {return condition.matches(TRUE_FALSE_PATTERN);}
 
-    public boolean hasInitializedVarCondition(String condition) {return condition.matches(INITIALIZED_VAR_PATTERN);}
+    public boolean hasInitializedVarCondition(String condition) {
+        return condition.matches(INITIALIZED_VAR_PATTERN);
+    }
 }

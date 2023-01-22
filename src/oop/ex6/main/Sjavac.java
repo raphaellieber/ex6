@@ -30,28 +30,25 @@ public class Sjavac {
 
         catch (IOException e) {
             System.err.println("File was not found or can't be open");
-            return FAILURE;
-        }
-
-        catch (IDENTIFIERException | SYNTAXException | VALUEException e) {
-            System.err.println(e.getMessage());
             return IO_ERROR;
         }
 
+        catch (IDENTIFIERException | SYNTAXException | SCOPEException |VALUEException e) {
+            System.err.println(e.getMessage());
+            return FAILURE;
+        }
         return SUCCESS;
     }
 
     public static void main(String[] args) {
-//
-//        if (args.length == 0) {
-//            System.err.println("No file path given");
-//            return FAILURE;
-//        }
-//
-//        String filePath = args[0];
-//        return compileFile(filePath);
 
-        String line = "agdgad    fg a   { {  ";
-        System.out.println(line.matches("^[^{]*\\{\\s*$"));
+        if (args.length == 0) {
+            System.err.println("No file path given");
+            System.out.println(FAILURE);;
+        }
+
+        String filePath = args[0];
+        System.out.println(compileFile(filePath));
+
     }
 }

@@ -4,9 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6b111afd-306a-4de0-9da9-92db7b427c29" name="Changes" comment="Added option to have multiple conditions in If/While.">
+    <list default="true" id="27397662-d302-41b9-8131-0f0e485311c3" name="Changes" comment="commentation of the code">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/CorrectnessChecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/CorrectnessChecker.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/Sjavac.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/Sjavac.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/function/handling/Function.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/function/handling/Function.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,29 +43,16 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
-  }
-}</component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+  </component>
   <component name="RunManager">
-    <configuration name="Unnamed" type="Application" factoryName="Application" nameIsGenerated="true">
+    <configuration name="Sjavac" type="Application" factoryName="Application" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="oop.ex6.main.Sjavac" />
       <module name="ex6" />
+      <option name="PROGRAM_PARAMETERS" value="tests\test501.sjava" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -78,6 +68,7 @@
       <updated>1673508840689</updated>
       <workItem from="1673508842767" duration="433000" />
       <workItem from="1673509283810" duration="558000" />
+      <workItem from="1674415609490" duration="483000" />
     </task>
     <task id="LOCAL‎-00001" summary="added classes">
       <created>1673551477090</created>
@@ -135,28 +126,7 @@
       <option name="project" value="LOCAL‎" />
       <updated>1674165363996</updated>
     </task>
-    <task id="LOCAL-00009" summary="Moved If/While syntax verification to CorrectnessChecker.">
-      <created>1674414372033</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1674414372033</updated>
-    </task>
-    <task id="LOCAL-00010" summary="TODO in complieIfWhile">
-      <created>1674415161496</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1674415161496</updated>
-    </task>
-    <task id="LOCAL-00011" summary="Added option to have multiple conditions in If/While.">
-      <created>1674421417330</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1674421417330</updated>
-    </task>
-    <option name="localTasksCounter" value="12" />
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -206,20 +176,20 @@
     <MESSAGE value="update" />
     <MESSAGE value="update after talking" />
     <MESSAGE value="finished my part except function call -&gt; need to discuss some things&#10;fixed most of the todo things all over the code except in Raphael's part" />
-    <MESSAGE value="Moved If/While syntax verification to CorrectnessChecker." />
-    <MESSAGE value="TODO in complieIfWhile" />
-    <MESSAGE value="Added option to have multiple conditions in If/While." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added option to have multiple conditions in If/While." />
+    <option name="LAST_COMMIT_MESSAGE" value="finished my part except function call -&gt; need to discuss some things&#10;fixed most of the todo things all over the code except in Raphael's part" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/oop/ex6/main/CorrectnessChecker.java</url>
-          <line>115</line>
-          <option name="timeStamp" value="1" />
+          <url>file://$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java</url>
+          <line>429</line>
+          <option name="timeStamp" value="16" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/Sjavac_java$Sjavac.ic" NAME="Sjavac Coverage Results" MODIFIED="1674416260155" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
 </project>

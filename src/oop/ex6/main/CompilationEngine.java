@@ -40,8 +40,6 @@ public class CompilationEngine {
     private static final String ASSIGNMENT_REGEX = "^.*=.*";
     private static final String FUNCTION_CALL_REGEX = "^.*\\(.*\\).*";
 
-    private static final String CONDITION_DELIMITER = "(\\|\\|)|(&&)";
-
     // Exceptions messages:
     private static final String ILLEGAL_FUNC_NAME = "Illegal function name";
     private static final String ILLEGAL_VAR_NAME = "Illegal var name";
@@ -51,17 +49,18 @@ public class CompilationEngine {
     private static final String ILLEGAL_END_OF_LINE = "Illegal end of line";
     private static final String ILLEGAL_DECLARATION_LINE = "Illegal declaration line";
     private static final String ILLEGAL_FUNCTION_DECLARATION = "Illegal in function - function declaration";
+    private static final String ILLEGAL_FUNC_DEC_LINE = "Illegal function declaration";
     private static final String IF_WHILE_OUT_OF_METHOD = "If/While declared out of method";
     private static final String IF_WHILE_EXCEEDING_DEPTH = "If/While statement exceeding max depth";
     private static final String ILLEGAL_IF_WHILE = "If/While declared out of function";
 //    private static final String ASSIGNING_FINAL_VAR = "Illegal assignment of final var";
-    private static final String ILLEGAL_CONDITION = "Illegal condition used in if/while statement.";
     private static final String ILLEGAL_FUNCTION_CALL = "Illegal function call";
     private static final String ILLEGAL_NUM_OF_PARAMS = "Given illegal number of params";
     private static final String ILLEGAL_ASSIGNMENT = "Illegal assignment of var, may be final or undeclared";
     private static final String UNDECLARED_PARAM = "Used undeclared param";
     private static final String VAR_ALREADY_DECLARED = "Var with same name was declared in this scope";
     private static final String FUNC_ALREADY_DECLARED = "Function with same name was declared in this scope";
+    private static final String ILLEGAL_LINE = "Illegal line";
 
     private static final ArrayList<String> DECLARATION_KEYWORDS = new ArrayList<>() {
         {
@@ -92,7 +91,7 @@ public class CompilationEngine {
         this.functionTable = functionTable;
         this.reader = reader;
         this.firstRunReader = firstRunReader;
-        this.inFuncFlag = true;
+        this.inFuncFlag = false;
         this.scopeDepthIfWhile = 0L;
         this.currentFuncName = null;
 
@@ -130,7 +129,7 @@ public class CompilationEngine {
      */
     private void compileLine(String line) throws SYNTAXException, VALUEException, IDENTIFIERException,
             SCOPEException {
-        while (!line.equals("")) {
+        if (!line.equals("")) {
 
             int firstSpace = line.indexOf(SPACE);
             String firstWord = "";
@@ -155,12 +154,16 @@ public class CompilationEngine {
             else {if (line.matches(ASSIGNMENT_REGEX)) { compileVarAssignment(line); }
 
             // function call
-            else {if (line.matches(FUNCTION_CALL_REGEX)) {compileFunctionCall(line);}}
+            else {if (line.matches(FUNCTION_CALL_REGEX)) {compileFunctionCall(line);}
 
-            }}}}}
+            else {throw new SYNTAXException(ILLEGAL_LINE);}
+
+            }}}}}}
+
         }
     }
 
+    // todo check if the given param is the actual value
 
     /**
      * A method that charge of compiling a function call
@@ -189,6 +192,7 @@ public class CompilationEngine {
         // checking the vars and getting their types
         List<String> paramsTypeList = checkFuncCallParamList(funcName, splitParam);
 
+        // todo move this check into the checker and to allow int into double, int + double into boolean
         // checking if number of types is sufficient and the types matches to the function params list
         if (!this.functionTable.checkParamListMatchesFunction(funcName,paramsTypeList)){
             throw new SYNTAXException(ILLEGAL_NUM_OF_PARAMS);
@@ -508,24 +512,11 @@ public class CompilationEngine {
      */
     private boolean exceededMaxScopeDepth() {return this.scopeDepthIfWhile > Integer.MAX_VALUE;}
 
-    private boolean hasValidIfWhileCondition(String condition) {
-        String[] conditions = condition.split(CONDITION_DELIMITER);
-        for (String singleCondition : conditions) {
-            if (!isValidSingleCondition(singleCondition))
-                return false;
-        }
-        return true;
-    }
-
-    private boolean isValidSingleCondition(String singleCondition) {
-        return this.checker.hasTrueFalseCondition(singleCondition) || this.checker.hasValueCondition(singleCondition)
-                || legalIfWhileInitializedVarCondition(singleCondition);
-    }
-
     private boolean legalIfWhileInitializedVarCondition(String condition) {
-        return this.checker.hasInitializedVarCondition(condition) && varTable.varDeclared(condition) && (
-                varTable.getVarType(condition).equals(BOOLEAN) | varTable.getVarType(condition).equals(DOUBLE) ||
-                        varTable.getVarType(condition).equals(INT));
+        return this.checker.hasInitializedVarCondition(condition) & varTable.varDeclared(condition) &
+                            (varTable.getVarType(condition).equals(BOOLEAN) |
+                            varTable.getVarType(condition).equals(DOUBLE) |
+                            varTable.getVarType(condition).equals(INT));
     }
 
 
@@ -550,12 +541,11 @@ public class CompilationEngine {
         if(this.checker.hasLegalIfWhilePattern(line)) {
             int openingBracketIndex = line.indexOf("(");
             int closingBracketIndex = line.lastIndexOf(")");
-            String condition = line.substring(openingBracketIndex + 1, closingBracketIndex);
-            if(checker.hasLegalConditionPattern(condition))
-                if(this.hasValidIfWhileCondition(condition))
-                    increaseScopeDepthIfWhile();
+            String condition = line.substring(openingBracketIndex, closingBracketIndex + 1);
+            if(this.checker.hasTrueFalseCondition(condition) || this.checker.hasValueCondition(condition)
+                    || legalIfWhileInitializedVarCondition(condition))
+                increaseScopeDepthIfWhile();
         }
-        throw new SYNTAXException(ILLEGAL_CONDITION);
         //TODO: add possibility to have multiple conditions using || and &&
     }
 
@@ -579,7 +569,7 @@ public class CompilationEngine {
 
                 // checking validity of the given line
                 if (!this.checker.legalFunctionDeclarationLine(line)) {
-                    throw  new SYNTAXException(ILLEGAL_FUNCTION_DECLARATION);
+                    throw  new SYNTAXException(ILLEGAL_FUNC_DEC_LINE);
                 }
 
                 // dividing into 2 sections: func name, params
@@ -593,7 +583,8 @@ public class CompilationEngine {
 
                 // creating the function object and dealing with its params list:
                 Function function = new Function(funcName, VOID);
-                funcDeclarationParamsListCheck(paramList, function);
+
+                if (paramList.length() > 0) { funcDeclarationParamsListCheck(paramList, function); }
 
                 if (!this.functionTable.addFunction(funcName, function)) {
                     throw new SYNTAXException(FUNC_ALREADY_DECLARED);

@@ -34,7 +34,7 @@ public class Function {
         this.varsMap.put(name, var);
         this.typesList.add(type);
 
-        return false;
+        return true;
     }
 
     public boolean isVarAFuncArgument(String name) { return this.varsMap.containsKey(name); }
