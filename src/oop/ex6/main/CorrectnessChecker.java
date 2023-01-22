@@ -11,9 +11,10 @@ public class CorrectnessChecker {
 
     // if/while regex
     private static final String GENERIC_IF_WHILE_PATTERN = "^\\s*(if|while)\\s*\\(.*\\)\\s*\\{\\n";
-    private static final String TRUE_FALSE_PATTERN = "\\(\\s*true|false\\s*\\)";
-    private static final String INITIALIZED_VAR_PATTERN = "\\(\\s*\\w+\\s*\\)";
-    private static final String VALUE_PATTERN = "\\(\\s*-?((\\d+.?\\d*)|(\\d*.?\\d+))\\s*\\)";
+    private static final String GENERIC_CONDITION_PATTERN = "\\(\\s*\\w+\\s*(((\\|\\|)|(&&))\\s*\\w+\\s*)*\\)";
+    private static final String TRUE_FALSE_PATTERN = "\\s*true|false\\s*";
+    private static final String INITIALIZED_VAR_PATTERN = "\\s*\\w+\\s*";
+    private static final String VALUE_PATTERN = "\\s*-?((\\d+.?\\d*)|(\\d*.?\\d+))\\s*";
 
     // values regex
     private static final String INT_VALUE = "^[-+]?\\d+";
@@ -143,13 +144,11 @@ public class CorrectnessChecker {
 
     public boolean hasLegalIfWhilePattern(String line) {return line.matches(GENERIC_IF_WHILE_PATTERN);}
 
-    public boolean hasValueCondition(String condition) {
-        return condition.matches(VALUE_PATTERN);
-    }
+    public boolean hasLegalContitionPattern(String condition) {return condition.matches(GENERIC_CONDITION_PATTERN);}
 
-    public boolean hasTrueFalseCondition(String condition) {
-        return condition.matches(TRUE_FALSE_PATTERN);
-    }
+    public boolean hasValueCondition(String condition) {return condition.matches(VALUE_PATTERN);}
+
+    public boolean hasTrueFalseCondition(String condition) {return condition.matches(TRUE_FALSE_PATTERN);}
 
     public boolean hasInitializedVarCondition(String condition) {return condition.matches(INITIALIZED_VAR_PATTERN);}
 }

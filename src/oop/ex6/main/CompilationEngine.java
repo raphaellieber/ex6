@@ -40,6 +40,8 @@ public class CompilationEngine {
     private static final String ASSIGNMENT_REGEX = "^.*=.*";
     private static final String FUNCTION_CALL_REGEX = "^.*\\(.*\\).*";
 
+    private static final String CONDITION_DELIMITER = "(\\|\\|)|(&&)";
+
     // Exceptions messages:
     private static final String ILLEGAL_FUNC_NAME = "Illegal function name";
     private static final String ILLEGAL_VAR_NAME = "Illegal var name";
@@ -505,10 +507,24 @@ public class CompilationEngine {
      */
     private boolean exceededMaxScopeDepth() {return this.scopeDepthIfWhile > Integer.MAX_VALUE;}
 
+    private boolean hasValidIfWhileCondition(String condition) {
+        String[] conditions = condition.split(CONDITION_DELIMITER);
+        for(String singleCondition : conditions) {
+            if(!isValidSingleCondition(singleCondition))
+                return false;
+        }
+        return true;
+    }
+
+    private boolean isValidSingleCondition(String singleCondition) {
+        return this.checker.hasTrueFalseCondition(singleCondition) || this.checker.hasValueCondition(singleCondition)
+                || legalIfWhileInitializedVarCondition(singleCondition);
+    }
+
     private boolean legalIfWhileInitializedVarCondition(String condition) {
         return this.checker.hasInitializedVarCondition(condition) && varTable.varDeclared(condition) && (
-                varTable.getVarType(condition) == BOOLEAN || varTable.getVarType(condition) == DOUBLE ||
-                        varTable.getVarType(condition) == INT);
+                varTable.getVarType(condition).equals(BOOLEAN) | varTable.getVarType(condition).equals(DOUBLE) ||
+                        varTable.getVarType(condition).equals(INT));
     }
 
 
@@ -533,9 +549,8 @@ public class CompilationEngine {
         if(this.checker.hasLegalIfWhilePattern(line)) {
             int openingBracketIndex = line.indexOf("(");
             int closingBracketIndex = line.lastIndexOf(")");
-            String condition = line.substring(openingBracketIndex, closingBracketIndex + 1);
-            if(this.checker.hasTrueFalseCondition(condition) || this.checker.hasValueCondition(condition)
-                    || legalIfWhileInitializedVarCondition(condition))
+            String condition = line.substring(openingBracketIndex + 1, closingBracketIndex);
+            if(this.hasValidIfWhileCondition(condition))
                 increaseScopeDepthIfWhile();
         }
         //TODO: add possibility to have multiple conditions using || and &&
