@@ -1,20 +1,22 @@
 package oop.ex6.main;
 
+import java.util.List;
+
 public class CorrectnessChecker {
 
 
     private static final String VAR_NAME = "^(?!(_(?!\\w)|\\d))\\w+";
-    private static final String PARAMETERS_DELIMITER = "\\(|,\\s|\\)";
+//    private static final String PARAMETERS_DELIMITER = "\\(|,\\s|\\)";
     private static final String METHOD_NAME = "^(?!(_|\\d))\\w+";
-    private static final String METHOD_PARAMETERS = "\\((\\w+\\s\\w+)(,\\s\\w+\\s\\w+)*\\)";
-    private static final String SINGLE_PARAMETER_DELIMITER = "\\s";
+//    private static final String METHOD_PARAMETERS = "\\((\\w+\\s\\w+)(,\\s\\w+\\s\\w+)*\\)";
+//    private static final String SINGLE_PARAMETER_DELIMITER = "\\s";
 
     // if/while regex
-    private static final String GENERIC_IF_WHILE_PATTERN = "^\\s*(if|while)\\s*\\(.*\\)\\s*\\{\\n";
+    private static final String GENERIC_IF_WHILE_PATTERN = "^\\s*(if|while)\\s*\\(.*\\)\\s*\\{";
     private static final String GENERIC_CONDITION_PATTERN = "\\(\\s*\\w+\\s*(((\\|\\|)|(&&))\\s*\\w+\\s*)*\\)";
     private static final String TRUE_FALSE_PATTERN = "\\s*true|false\\s*";
     private static final String INITIALIZED_VAR_PATTERN = "\\s*\\w+\\s*";
-    private static final String VALUE_PATTERN = "\\s*-?((\\d+.?\\d*)|(\\d*.?\\d+))\\s*";
+    private static final String VALUE_PATTERN = "\\s*[+-]?((\\d+.?\\d*)|(\\d*.?\\d+))\\s*";
 
     // values regex
     private static final String INT_VALUE = "^[-+]?\\d+";
@@ -37,7 +39,7 @@ public class CorrectnessChecker {
     private static final String BOOLEAN = "boolean";
     private static final String STRING = "String";
     private static final String CHAR = "char";
-    private static final String VOID = "void";
+//    private static final String VOID = "void";
 
 
     /**
@@ -94,33 +96,33 @@ public class CorrectnessChecker {
      */
     public boolean legalMethodName(String name) {return name.matches(METHOD_NAME);}
 
-    /**
-     * A method that verifies whether the method returns a legal type.
-     * In the case of the current exercise, the method shouldn't return anything and therefore should have
-     * void as its returType.
-     * @param returnType the method return type.
-     * @return true if correct, false otherwise.
-     */
-    public boolean isLegalMethodReturnType(String returnType) {return returnType.equals(VOID);}
+//    /**
+//     * A method that verifies whether the method returns a legal type.
+//     * In the case of the current exercise, the method shouldn't return anything and therefore should have
+//     * void as its returType.
+//     * @param returnType the method return type.
+//     * @return true if correct, false otherwise.
+//     */
+//    public boolean isLegalMethodReturnType(String returnType) {return returnType.equals(VOID);}
 
-    public boolean legalMethodParameter(String parameter) {
-        String[] delimitedParameter = parameter.split(SINGLE_PARAMETER_DELIMITER);
-        String type = delimitedParameter[0];
-        String name = delimitedParameter[1];
-        return isLegalVarType(type) && isLegalVarName(name);
-    }
+//    public boolean legalMethodParameter(String parameter) {
+//        String[] delimitedParameter = parameter.split(SINGLE_PARAMETER_DELIMITER);
+//        String type = delimitedParameter[0];
+//        String name = delimitedParameter[1];
+//        return isLegalVarType(type) && isLegalVarName(name);
+//    }
 
-    public boolean hasLegalMethodParameters(String parameters) {
-        if(parameters.matches(METHOD_PARAMETERS)) {
-            String[] singleParameters = parameters.split(PARAMETERS_DELIMITER);
-            for(String singleParameter : singleParameters) {
-                if(!legalMethodParameter(singleParameter))
-                    return false;
-            }
-            return true;
-        }
-        return false;
-    }
+//    public boolean hasLegalMethodParameters(String parameters) {
+//        if(parameters.matches(METHOD_PARAMETERS)) {
+//            String[] singleParameters = parameters.split(PARAMETERS_DELIMITER);
+//            for(String singleParameter : singleParameters) {
+//                if(!legalMethodParameter(singleParameter))
+//                    return false;
+//            }
+//            return true;
+//        }
+//        return false;
+//    }
 
     /**
      * A method that checks if the line ends legally - with semicolon (;) and has only one semicolon
@@ -153,4 +155,32 @@ public class CorrectnessChecker {
     public boolean hasInitializedVarCondition(String condition) {
         return condition.matches(INITIALIZED_VAR_PATTERN);
     }
+
+    /**
+     * The method checks if assigner can be assigned to receiver
+     * @param receiver
+     * @param assigner
+     * @return
+     */
+    public boolean checkEqualTypes(String receiver, String assigner){
+        if (receiver.equals(BOOLEAN) & (assigner.equals(INT) | (assigner.equals(DOUBLE)))) { return true; }
+        else { if (receiver.equals(DOUBLE) & (assigner.equals(INT))) {return true;}
+        else { return receiver.equals(assigner); }}
+    }
+
+    public boolean checkEqualTypesAll (List<String> receiverTypeList, List<String> assignersTypeList) {
+
+        // checking sizes
+        if (receiverTypeList.size() != assignersTypeList.size()) {return false;}
+
+        // checking each type
+        for (int i = 0; i < receiverTypeList.size(); i++) {
+            if (!checkEqualTypes(receiverTypeList.get(i),assignersTypeList.get(i))) {return false;}
+        }
+        return true;
+
+
+    }
+
+//    public boolean checkFunkDeclarationParamList(String line){ }
 }

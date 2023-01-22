@@ -32,10 +32,9 @@ public class FunctionTable {
         return this.functions.get(funcName).getVarType(varName);
     }
 
-    public boolean checkParamListMatchesFunction(String funcName, List<String> paramsList) {
+    public List<String> getTypeList(String funcName) {
         Function function = this.functions.get(funcName);
-        List<String> orgParamsList = function.getTypesList();
-        return orgParamsList.equals(paramsList);
+        return function.getTypesList();
     }
 
     public Set<Map.Entry<String, Var>> varsMap(String name) { return this.functions.get(name).getVarsSet(); }

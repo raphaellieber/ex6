@@ -44,11 +44,12 @@ public class Sjavac {
 
         if (args.length == 0) {
             System.err.println("No file path given");
-            System.out.println(FAILURE);;
+            System.out.println(IO_ERROR);;
         }
 
-        String filePath = args[0];
-        System.out.println(compileFile(filePath));
-
+        else {
+            String filePath = args[0];
+            System.out.println(compileFile(filePath));
+        }
     }
 }

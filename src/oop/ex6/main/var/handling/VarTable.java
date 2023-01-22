@@ -119,9 +119,12 @@ public class VarTable {
     /**
      * A method that updates the scope counter
      */
-    public void outOfScope() {
+    public boolean outOfScope() {
+        if (this.scopeInd == 0) { return false;}
+
         this.scopeInd --;
         this.vars.removeLast();
+        return true;
     }
 
     /**

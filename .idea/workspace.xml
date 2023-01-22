@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6b111afd-306a-4de0-9da9-92db7b427c29" name="Changes" comment="Corrected">
+    <list default="true" id="27397662-d302-41b9-8131-0f0e485311c3" name="Changes" comment="another update">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,9 +61,10 @@
   }
 }</component>
   <component name="RunManager">
-    <configuration name="Unnamed" type="Application" factoryName="Application" nameIsGenerated="true">
+    <configuration name="Sjavac" type="Application" factoryName="Application" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="oop.ex6.main.Sjavac" />
       <module name="ex6" />
+      <option name="PROGRAM_PARAMETERS" value="tests\test452.sjava" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -149,14 +151,21 @@
       <option name="project" value="LOCAL" />
       <updated>1674415161496</updated>
     </task>
-    <task id="LOCAL-00011" summary="Corrected">
-      <created>1674426411076</created>
+    <task id="LOCAL‎-00011" summary="update">
+      <created>1674428084707</created>
       <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1674426411076</updated>
+      <option name="presentableId" value="LOCAL‎-00011" />
+      <option name="project" value="LOCAL‎" />
+      <updated>1674428084707</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL‎-00012" summary="another update">
+      <created>1674429037797</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL‎-00012" />
+      <option name="project" value="LOCAL‎" />
+      <updated>1674429037797</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -203,24 +212,34 @@
     <MESSAGE value="exception classes" />
     <MESSAGE value="added packages: varHandling and Function handling&#10;added Var class (similar to the method class)&#10;made some minor changes in the VarTable class -&gt; made it simpler&#10;added exception handling to the initiateFuncTable function" />
     <MESSAGE value="changed compileDeclaration function in CompilationEngine to more general and modular without using tokenizer at all" />
-    <MESSAGE value="update" />
     <MESSAGE value="update after talking" />
     <MESSAGE value="finished my part except function call -&gt; need to discuss some things&#10;fixed most of the todo things all over the code except in Raphael's part" />
     <MESSAGE value="Moved If/While syntax verification to CorrectnessChecker." />
     <MESSAGE value="TODO in complieIfWhile" />
-    <MESSAGE value="Corrected" />
-    <option name="LAST_COMMIT_MESSAGE" value="Corrected" />
+    <MESSAGE value="update" />
+    <MESSAGE value="another update" />
+    <option name="LAST_COMMIT_MESSAGE" value="another update" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/oop/ex6/main/CorrectnessChecker.java</url>
-          <line>115</line>
-          <option name="timeStamp" value="1" />
+          <url>file://$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java</url>
+          <line>138</line>
+          <option name="timeStamp" value="30" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java</url>
+          <line>149</line>
+          <option name="timeStamp" value="31" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+    <watches-manager>
+      <configuration name="Application">
+        <watch expression="((VarTable)((CompilationEngine)this).varTable).scopeInd" custom="oop.ex6.main.var.handling.VarTable,oop.ex6.main.CompilationEngine" />
+      </configuration>
+    </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Sjavac_java$Sjavac.ic" NAME="Sjavac Coverage Results" MODIFIED="1674416260155" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
