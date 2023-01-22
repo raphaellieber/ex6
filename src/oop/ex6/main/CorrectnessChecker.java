@@ -1,5 +1,7 @@
 package oop.ex6.main;
 
+import java.util.List;
+
 public class CorrectnessChecker {
 
 
@@ -10,11 +12,11 @@ public class CorrectnessChecker {
     private static final String SINGLE_PARAMETER_DELIMITER = "\\s";
 
     // if/while regex
-    private static final String GENERIC_IF_WHILE_PATTERN = "^\\s*(if|while)\\s*\\(.*\\)\\s*\\{\\n";
+    private static final String GENERIC_IF_WHILE_PATTERN = "^\\s*(if|while)\\s*\\(.*\\)\\s*\\{";
     private static final String GENERIC_CONDITION_PATTERN = "\\(\\s*\\w+\\s*(((\\|\\|)|(&&))\\s*\\w+\\s*)*\\)";
     private static final String TRUE_FALSE_PATTERN = "\\s*true|false\\s*";
     private static final String INITIALIZED_VAR_PATTERN = "\\s*\\w+\\s*";
-    private static final String VALUE_PATTERN = "\\s*-?((\\d+.?\\d*)|(\\d*.?\\d+))\\s*";
+    private static final String VALUE_PATTERN = "\\s*[+-]?((\\d+.?\\d*)|(\\d*.?\\d+))\\s*";
 
     // values regex
     private static final String INT_VALUE = "^[-+]?\\d+";
@@ -152,5 +154,31 @@ public class CorrectnessChecker {
 
     public boolean hasInitializedVarCondition(String condition) {
         return condition.matches(INITIALIZED_VAR_PATTERN);
+    }
+
+    /**
+     * The method checks if assigner can be assigned to receiver
+     * @param receiver
+     * @param assigner
+     * @return
+     */
+    public boolean checkEqualTypes(String receiver, String assigner){
+        if (receiver.equals(BOOLEAN) & (assigner.equals(INT) | (assigner.equals(DOUBLE)))) { return true; }
+        else { if (receiver.equals(DOUBLE) & (assigner.equals(INT))) {return true;}
+        else { return receiver.equals(assigner); }}
+    }
+
+    public boolean checkEqualTypesAll (List<String> receiverTypeList, List<String> assignersTypeList) {
+
+        // checking sizes
+        if (receiverTypeList.size() != assignersTypeList.size()) {return false;}
+
+        // checking each type
+        for (int i = 0; i < receiverTypeList.size(); i++) {
+            if (!checkEqualTypes(receiverTypeList.get(i),assignersTypeList.get(i))) {return false;}
+        }
+        return true;
+
+
     }
 }
