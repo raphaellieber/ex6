@@ -1,33 +1,42 @@
 package oop.ex6.main.function.handling;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import oop.ex6.main.var.handling.Var;
+
+import java.util.*;
 
 public class FunctionTable {
-    private final HashMap<String, ArrayList<String>> functions;
+    private final HashMap<String, Function> functions;
 
     public FunctionTable(){
         this.functions = new HashMap<>();
     }
 
-    public boolean addFunction(String name, ArrayList<String> paramTypes){
+    public boolean addFunction(String name, Function function){
         // checks if function already declared before
         if (this.functions.containsKey(name)) {return false;}
 
         // adds the new func to the table
-        this.functions.put(name, paramTypes);
+        this.functions.put(name, function);
         return true;
     }
 
-    /**
-     * A getter for the function's param types array
-     * the method considers that the function has already declared!!
-     * @param name represents the name of the function
-     * @return Arraylist of param types
-     */
-    public ArrayList<String> getFuncParamTypes(String name) {
-        return this.functions.get(name);
+    public boolean isFuncDeclared (String name){ return this.functions.containsKey(name); }
+
+//    public Function getFunction(String name) {return this.functions.get(name);}
+
+    public boolean isAFuncVar(String funcName, String varName){
+        return this.functions.get(funcName).isVarAFuncArgument(varName);
     }
 
-    public boolean isFuncDeclared (String name){ return this.functions.containsKey(name); }
+    public String getFuncVarsType(String funcName, String varName) {
+        return this.functions.get(funcName).getVarType(varName);
+    }
+
+    public boolean checkParamListMatchesFunction(String funcName, List<String> paramsList) {
+        Function function = this.functions.get(funcName);
+        List<String> orgParamsList = function.getTypesList();
+        return orgParamsList.equals(paramsList);
+    }
+
+    public Set<Map.Entry<String, Var>> varsMap(String name) { return this.functions.get(name).getVarsSet(); }
 }

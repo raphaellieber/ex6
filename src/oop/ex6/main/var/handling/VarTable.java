@@ -1,9 +1,6 @@
 package oop.ex6.main.var.handling;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 public class VarTable {
 
@@ -29,19 +26,24 @@ public class VarTable {
      * @param value String that represents vars value, may be null
      * @return true upon success, false otherwise
      */
-    public boolean addVar(String name, boolean finalOrNot, String type, String value){
+    public boolean addVar(String name, boolean finalOrNot, String type, String value,
+                          boolean functionalParam){
 
         // check if the var is already in the table at the same scope:
         if (varDeclaredInCurScope(name)) { return false;}
 
         // creating the var according to the given params
-        Var var = new Var(finalOrNot, type, value);
+        Var var = new Var(finalOrNot, type, value, functionalParam);
 
         // inserting into the vars table at the last scope
         this.vars.getLast().put(name, var);
 
         return true;
     }
+
+    public void addAll(Set<Map.Entry<String, Var>> varSet) {
+        for (Map.Entry<String, Var> v: varSet) { this.vars.getLast().put(v.getKey(), v.getValue());}
+        }
 
     /**
      * A method that checks if a var is already declared in current scope
@@ -146,7 +148,7 @@ public class VarTable {
      */
     public boolean setValue(String name, String value){
         if (varDeclared(name)) {
-            // first checking in the local scopes
+
             Iterator<HashMap<String, Var>> iterator = this.vars.descendingIterator();
             while (iterator.hasNext()) {
                 for (Map.Entry<String, Var> entry : iterator.next().entrySet()) {
@@ -164,5 +166,31 @@ public class VarTable {
         }
         // if not found the var at all
         return false;
+    }
+
+    /**
+     * The var should be inside the func!!!!
+     * @param name
+     * @return
+     */
+    public boolean isAFuncParam(String name) {
+        // checking the table in reversed order
+        Iterator<HashMap<String, Var>> iterator = this.vars.descendingIterator();
+        while( iterator.hasNext()) {
+            for (Map.Entry<String, Var> entry: iterator.next().entrySet()){
+                if (entry.getKey().equals(name)) { return entry.getValue().isAFuncParam();}
+            }
+        }
+        return false;
+    }
+
+    public void setAFuncParam(String name, boolean valueToChange) {
+        // checking the table in reversed order
+        Iterator<HashMap<String, Var>> iterator = this.vars.descendingIterator();
+        while( iterator.hasNext()) {
+            for (Map.Entry<String, Var> entry: iterator.next().entrySet()){
+                if (entry.getKey().equals(name)) { entry.getValue().setAFuncParam(valueToChange);}
+            }
+        }
     }
 }

@@ -5,6 +5,7 @@ public class Var {
     private final boolean finalOrNot;
     private final String type;
     private String value;
+    private boolean isAfFuncParam; // true if assigned by func param or is a func param
 
     /**
      * A constructor for a var object
@@ -12,11 +13,12 @@ public class Var {
      * @param type String that represents its type
      * @param value Stains the represents the vars value, can be null!
      */
-    public Var(boolean finalOrNot, String type, String value) {
+    public Var(boolean finalOrNot, String type, String value, boolean funcParam) {
 
         this.finalOrNot = finalOrNot;
         this.type = type;
         this.value = value;
+        this.isAfFuncParam = funcParam;
     }
 
     /**
@@ -44,4 +46,8 @@ public class Var {
      * @param value represents the given value
      */
     public void setValue(String value) { this.value = value;}
+
+    public void setAFuncParam(boolean afFuncParam) { this.isAfFuncParam = afFuncParam;}
+
+    public boolean isAFuncParam() {return this.isAfFuncParam;}
 }

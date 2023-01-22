@@ -1,23 +1,10 @@
 package oop.ex6.main;
 
-// todo should we use pattern and matcher or use the functionally of string.matches is okay??
-
-//ValidityChecker
-//CorrectnessChecker
-
-// TYPES = ["int", "double", "String", "boolean", "char"]
-// var name - "^(?!\d)[_]{1,}\w+|[A-Za-z]+\w*"
-// int value - "^[-+]{0,1}\d+"
-// double value = "^[-+]{0,1}\d+.{0,1}\d*|[-+]{0,1}\d*.{0,1}\d+"
-// boolean value = "true|false|^[-+]{0,1}\d+.{0,1}\d*|[-+]{0,1}\d*.{0,1}\d+"
-// string value = "^"[\w\W]*""
-// char Value = "^'[\w\W]{1}'"
-
 public class CorrectnessChecker {
+
 
     private static final String VAR_NAME = "^(?!(_(?!\\w)|\\d))\\w+";
     private static final String PARAMETERS_DELIMITER = "\\(|,\\s|\\)";
-    private static final String METHOD_GENERIC_PATTERN = "\\w+\\s+\\w+\\s*\\(.*\\)\\s*\\{";
     private static final String METHOD_NAME = "^(?!(_|\\d))\\w+";
     private static final String METHOD_PARAMETERS = "\\((\\w+\\s\\w+)(,\\s\\w+\\s\\w+)*\\)";
     private static final String SINGLE_PARAMETER_DELIMITER = "\\s";
@@ -35,13 +22,14 @@ public class CorrectnessChecker {
     private static final String ONLY_END_SEMICOLON_REGEX = "^[^;]*;\\s*$";
     private static final String ONLY_END_CURLY_BRACES_REGEX = "^[^{]*\\{\\s*$";
     private static final String FUNCTION_DEC_LINE_REGEX = "^.*\\(.*\\)\\s*\\{\\s*$";
+    private static final String FUNCTION_CALL_REGEX = "\\w+.*\\(.*\\)\\s*;\\s*$";
 
+    // Keywords
     private static final String INT = "int";
     private static final String DOUBLE = "double";
     private static final String BOOLEAN = "boolean";
     private static final String STRING = "String";
     private static final String CHAR = "char";
-
     private static final String VOID = "void";
 
 
@@ -93,14 +81,6 @@ public class CorrectnessChecker {
     }
 
     /**
-     * A method that verifies whether a single line contains a method declaration pattern of the form:
-     *      "returnType methodName (parameters) {".
-     * @param line the line to evaluate.
-     * @return true if correct, false otherwise.
-     */
-    public boolean hasMethodDeclarationPattern(String line) {return line.matches(METHOD_GENERIC_PATTERN);}
-
-    /**
      * A method that verifies whether the argument corresponds to a legal method name (i.e. starting with letters).
      * @param name the method name to verify.
      * @return true if correct, false otherwise.
@@ -110,7 +90,7 @@ public class CorrectnessChecker {
     /**
      * A method that verifies whether the method returns a legal type.
      * In the case of the current exercise, the method shouldn't return anything and therefore should have
-     * void as its returnType.
+     * void as its returType.
      * @param returnType the method return type.
      * @return true if correct, false otherwise.
      */
@@ -140,9 +120,7 @@ public class CorrectnessChecker {
      * @param line represents the given line
      * @return true if legal, false otherwise
      */
-    public boolean legalEndOfLine(String line) {
-        return line.matches(ONLY_END_SEMICOLON_REGEX);
-    }
+    public boolean legalEndOfLine(String line) { return line.matches(ONLY_END_SEMICOLON_REGEX); }
 
     /**
      * A method that checks if the line ends legally - with { and has only one { in it
@@ -154,6 +132,8 @@ public class CorrectnessChecker {
     public boolean legalFunctionDeclarationLine(String line) {
         return line.matches(FUNCTION_DEC_LINE_REGEX);
     }
+
+    public boolean legalFunctionCall(String line) { return line.matches(FUNCTION_CALL_REGEX); }
 
 
 
