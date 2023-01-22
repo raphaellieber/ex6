@@ -198,7 +198,6 @@ public class CompilationEngine {
         List<String> assignersTypeList = checkFuncCallParamList(funcName, splitParam);
         List<String> receiverTypeList = functionTable.getTypeList(funcName);
 
-        // todo move this check into the checker and to allow int into double, int + double into boolean
         // checking if number of types is sufficient and the types matches to the function params list
         if (!this.checker.checkEqualTypesAll(receiverTypeList, assignersTypeList)){
             throw new SYNTAXException(ILLEGAL_NUM_OF_PARAMS);
@@ -575,9 +574,9 @@ public class CompilationEngine {
                 int braceFinishLoc = line.indexOf(ROUND_CLOSE_BRACE);
                 int spaceLoc = line.indexOf(SPACE);
 
-                // checking validity of the given line
+                // checking validity of the given line: '(', ')' and {
                 if (!this.checker.legalFunctionDeclarationLine(line)) {
-                    throw  new SYNTAXException(ILLEGAL_FUNC_DEC_LINE);
+                    throw new SYNTAXException(ILLEGAL_FUNC_DEC_LINE);
                 }
 
                 // dividing into 2 sections: func name, params
