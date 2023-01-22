@@ -144,7 +144,7 @@ public class CorrectnessChecker {
 
     public boolean hasLegalIfWhilePattern(String line) {return line.matches(GENERIC_IF_WHILE_PATTERN);}
 
-    public boolean hasLegalContitionPattern(String condition) {return condition.matches(GENERIC_CONDITION_PATTERN);}
+    public boolean hasLegalConditionPattern(String condition) {return condition.matches(GENERIC_CONDITION_PATTERN);}
 
     public boolean hasValueCondition(String condition) {return condition.matches(VALUE_PATTERN);}
 

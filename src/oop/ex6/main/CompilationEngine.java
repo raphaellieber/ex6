@@ -55,6 +55,7 @@ public class CompilationEngine {
     private static final String IF_WHILE_EXCEEDING_DEPTH = "If/While statement exceeding max depth";
     private static final String ILLEGAL_IF_WHILE = "If/While declared out of function";
 //    private static final String ASSIGNING_FINAL_VAR = "Illegal assignment of final var";
+    private static final String ILLEGAL_CONDITION = "Illegal condition used in if/while statement.";
     private static final String ILLEGAL_FUNCTION_CALL = "Illegal function call";
     private static final String ILLEGAL_NUM_OF_PARAMS = "Given illegal number of params";
     private static final String ILLEGAL_ASSIGNMENT = "Illegal assignment of var, may be final or undeclared";
@@ -509,8 +510,8 @@ public class CompilationEngine {
 
     private boolean hasValidIfWhileCondition(String condition) {
         String[] conditions = condition.split(CONDITION_DELIMITER);
-        for(String singleCondition : conditions) {
-            if(!isValidSingleCondition(singleCondition))
+        for (String singleCondition : conditions) {
+            if (!isValidSingleCondition(singleCondition))
                 return false;
         }
         return true;
@@ -550,9 +551,11 @@ public class CompilationEngine {
             int openingBracketIndex = line.indexOf("(");
             int closingBracketIndex = line.lastIndexOf(")");
             String condition = line.substring(openingBracketIndex + 1, closingBracketIndex);
-            if(this.hasValidIfWhileCondition(condition))
-                increaseScopeDepthIfWhile();
+            if(checker.hasLegalConditionPattern(condition))
+                if(this.hasValidIfWhileCondition(condition))
+                    increaseScopeDepthIfWhile();
         }
+        throw new SYNTAXException(ILLEGAL_CONDITION);
         //TODO: add possibility to have multiple conditions using || and &&
     }
 
