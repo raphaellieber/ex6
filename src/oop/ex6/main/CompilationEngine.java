@@ -611,7 +611,7 @@ public class CompilationEngine {
     private void funcDeclarationParamsListCheck(String declaration, Function func) throws IDENTIFIERException,
             SYNTAXException {
         // todo general check for the line correctness!!
-        // the result will be: type name
+        // the result will be: type name or final type name
         String[] pramTypeTmp = declaration.split(FUNC_PARAM_LST_SPLIT_REGEX);
 
         for (String s: pramTypeTmp){
@@ -620,8 +620,7 @@ public class CompilationEngine {
             String[] split = s.split(SPACE);
 
             // checking if final or not
-            // todo -> no need of verifying the word is final because of the general check of the line
-            if (split.length == 3) { finalOrNot = true; }
+            if (split.length == 3 && split[0].equals(FINAL)) { finalOrNot = true; }
 
             String type = s.split(SPACE)[split.length - 2];
             String name = s.split(SPACE)[split.length - 1];

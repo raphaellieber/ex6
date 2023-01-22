@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="27397662-d302-41b9-8131-0f0e485311c3" name="Changes" comment="update">
+    <list default="true" id="27397662-d302-41b9-8131-0f0e485311c3" name="Changes" comment="another update">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/CorrectnessChecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/CorrectnessChecker.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -159,7 +158,14 @@
       <option name="project" value="LOCAL‎" />
       <updated>1674428084707</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL‎-00012" summary="another update">
+      <created>1674429037797</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL‎-00012" />
+      <option name="project" value="LOCAL‎" />
+      <updated>1674429037797</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -211,7 +217,8 @@
     <MESSAGE value="Moved If/While syntax verification to CorrectnessChecker." />
     <MESSAGE value="TODO in complieIfWhile" />
     <MESSAGE value="update" />
-    <option name="LAST_COMMIT_MESSAGE" value="update" />
+    <MESSAGE value="another update" />
+    <option name="LAST_COMMIT_MESSAGE" value="another update" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
