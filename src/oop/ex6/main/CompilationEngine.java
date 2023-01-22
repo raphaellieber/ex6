@@ -538,6 +538,7 @@ public class CompilationEngine {
                     || legalIfWhileInitializedVarCondition(condition))
                 increaseScopeDepthIfWhile();
         }
+        //TODO: add possibility to have multiple conditions using || and &&
     }
 
 
