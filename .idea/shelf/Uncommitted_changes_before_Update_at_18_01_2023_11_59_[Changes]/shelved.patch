@@ -1,0 +1,211 @@
+Index: src/oop/ex6/main/CorrectnessChecker.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package oop.ex6.main;\r\n\r\n// todo should we use pattern and matcher or use the functionally of string.matches is okay??\r\n\r\n\r\n// TYPES = [\"int\", \"double\", \"String\", \"boolean\", \"char\"]\r\n// var name - \"^(?!\\d)[_]{1,}\\w+|[A-Za-z]+\\w*\"\r\n// int value - \"^[-+]{0,1}\\d+\"\r\n// double value = \"^[-+]{0,1}\\d+.{0,1}\\d*|[-+]{0,1}\\d*.{0,1}\\d+\"\r\n// boolean value = \"true|false|^[-+]{0,1}\\d+.{0,1}\\d*|[-+]{0,1}\\d*.{0,1}\\d+\"\r\n// string value = \"^\"[\\w\\W]*\"\"\r\n// char Value = \"^'[\\w\\W]{1}'\"\r\n\r\npublic class CorrectnessChecker {\r\n\r\n    //    private static final String VAR_NAME = \"^(?!\\\\d)_+\\\\w+|[A-Za-z]+\\\\w*\";\r\n    private static final String VAR_NAME = \"^(?!(_(?!\\\\w)|\\\\d))\\\\w+\";\r\n    private static final String PARAMETERS_DELIMITER = \"\\\\(|,\\\\s|\\\\)\";\r\n    private static final String METHOD_NAME = \"^(?!(_|\\\\d))\\\\w+\";\r\n    private static final String METHOD_PARAMETERS = \"\\\\((\\\\w+\\\\s\\\\w+)(,\\\\s\\\\w+\\\\s\\\\w+)*\\\\)\";\r\n    private static final String SINGLE_PARAMETER_DELIMITER = \"\\\\s\";\r\n\r\n    // values regex\r\n    private static final String INT_VALUE = \"^[-+]?\\\\d+\";\r\n    private static final String DOUBLE_VALUE = \"^[-+]?\\\\d+.?\\\\d*|[-+]?\\\\d*.?\\\\d+\";\r\n    private static final String BOOLEAN_VALUE = \"true|false|^[-+]?\\\\d+.?\\\\d*|[-+]?\\\\d*.?\\\\d+\";\r\n    private static final String STRING_VALUE = \"^\\\"[\\\\w\\\\W]*\\\"\";\r\n    private static final String CHAR_VALUE = \"^'[\\\\w\\\\W]'\";\r\n\r\n    // line correctness regex\r\n    private static final String COMMENT_START = \"//\";\r\n    private static final String SPACES = \"^\\\\s+\";\r\n\r\n\r\n    private static final String INT = \"int\";\r\n    private static final String DOUBLE = \"double\";\r\n    private static final String BOOLEAN = \"boolean\";\r\n    private static final String STRING = \"String\";\r\n    private static final String CHAR = \"char\";\r\n\r\n    private static final String VOID = \"void\";\r\n\r\n\r\n    /**\r\n     * A method that verifies whether the argument corresponds to a legal variable name (i.e. starting with letters\r\n     * or with an underscore followed by any character).\r\n     * @param name the variable name to verify.\r\n     * @return ture if correct, false otherwise.\r\n     */\r\n    public boolean isLegalVarName(String name) {return name.matches(VAR_NAME); }\r\n\r\n    /**\r\n     * A function that checks the value correctness depends on a type\r\n     * @param type represents the type, can get: int, double, boolean, String, char\r\n     * @param value represents the value\r\n     * @return true if correct, false otherwise (as well if the given type don't match)\r\n     */\r\n    public boolean isLegalValue(String type, String value) {\r\n\r\n        switch (type){\r\n            case INT: return value.matches(INT_VALUE);\r\n            case DOUBLE: return value.matches(DOUBLE_VALUE);\r\n            case BOOLEAN: return value.matches(BOOLEAN_VALUE);\r\n            case STRING: return value.matches(STRING_VALUE);\r\n            case CHAR: return value.matches(CHAR_VALUE);\r\n        }\r\n\r\n        // if the type didn't match\r\n        return false;\r\n    }\r\n\r\n    /**\r\n     * A method that checks the validity of a given varType\r\n     * @param varType represents the given var type\r\n     * @return return true is valid, false otherwise\r\n     */\r\n    public boolean isLegalVarType(String varType) {\r\n        return varType.equals(INT) | varType.equals(DOUBLE) | varType.equals(CHAR) | varType.equals(STRING) |\r\n                varType.equals(BOOLEAN);\r\n    }\r\n\r\n    public boolean lineToIgnore(String line){\r\n        return line.startsWith(COMMENT_START) | line.matches(SPACES);\r\n    }\r\n\r\n    /**\r\n     * A method that verifies whether the argument corresponds to a legal method name (i.e. starting with letters).\r\n     * @param name the method name to verify.\r\n     * @return true if correct, false otherwise.\r\n     */\r\n    public boolean isLegalMethodName(String name) {return name.matches(METHOD_NAME);}\r\n\r\n    /**\r\n     * A method that verifies whether the method returns a legal type.\r\n     * In the case of the current exercise, the method shouldn't return anything and therefore should have\r\n     * void as its returType.\r\n     * @param returnType the method return type.\r\n     * @return true if correct, false otherwise.\r\n     */\r\n    public boolean isLegalMethodReturnType(String returnType) {return returnType.equals(VOID);}\r\n\r\n    public boolean isLegalMethodParameter(String parameter) {\r\n        String[] delimitedParameter = parameter.split(SINGLE_PARAMETER_DELIMITER);\r\n        String type = delimitedParameter[0];\r\n        String name = delimitedParameter[1];\r\n        return isLegalVarType(type) && isLegalVarName(name);\r\n    }\r\n\r\n    public boolean hasLegalMethodParameters(String parameters) {\r\n        if(parameters.matches(METHOD_PARAMETERS)) {\r\n            String[] singleParameters = parameters.split(PARAMETERS_DELIMITER);\r\n            for(String singleParameter : singleParameters) {\r\n                if(!isLegalMethodParameter(singleParameter))\r\n                    return false;\r\n            }\r\n            return true;\r\n        }\r\n        return false;\r\n    }\r\n\r\n\r\n\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/oop/ex6/main/CorrectnessChecker.java b/src/oop/ex6/main/CorrectnessChecker.java
+--- a/src/oop/ex6/main/CorrectnessChecker.java	(revision f2e08f4c028b574ec663f1bca28e651fc76073aa)
++++ b/src/oop/ex6/main/CorrectnessChecker.java	(date 1673716422409)
+@@ -13,9 +13,9 @@
+ 
+ public class CorrectnessChecker {
+ 
+-    //    private static final String VAR_NAME = "^(?!\\d)_+\\w+|[A-Za-z]+\\w*";
+     private static final String VAR_NAME = "^(?!(_(?!\\w)|\\d))\\w+";
+     private static final String PARAMETERS_DELIMITER = "\\(|,\\s|\\)";
++    private static final String METHOD_GENERIC_PATTERN = "\\w+\\s+\\w+\\s*\\(.*\\)\\s*\\{";
+     private static final String METHOD_NAME = "^(?!(_|\\d))\\w+";
+     private static final String METHOD_PARAMETERS = "\\((\\w+\\s\\w+)(,\\s\\w+\\s\\w+)*\\)";
+     private static final String SINGLE_PARAMETER_DELIMITER = "\\s";
+@@ -83,6 +83,14 @@
+         return line.startsWith(COMMENT_START) | line.matches(SPACES);
+     }
+ 
++    /**
++     * A method that verifies whether a single line contains a method declaration pattern of the form:
++     *      "returnType methodName (parameters) {".
++     * @param line the line to evaluate.
++     * @return true if correct, false otherwise.
++     */
++    public boolean hasMethodDeclarationPattern(String line) {return line.matches(METHOD_GENERIC_PATTERN);}
++
+     /**
+      * A method that verifies whether the argument corresponds to a legal method name (i.e. starting with letters).
+      * @param name the method name to verify.
+@@ -93,7 +101,7 @@
+     /**
+      * A method that verifies whether the method returns a legal type.
+      * In the case of the current exercise, the method shouldn't return anything and therefore should have
+-     * void as its returType.
++     * void as its returnType.
+      * @param returnType the method return type.
+      * @return true if correct, false otherwise.
+      */
+Index: src/oop/ex6/main/MethodChecker.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/oop/ex6/main/MethodChecker.java b/src/oop/ex6/main/MethodChecker.java
+new file mode 100644
+--- /dev/null	(date 1673756788253)
++++ b/src/oop/ex6/main/MethodChecker.java	(date 1673756788253)
+@@ -0,0 +1,74 @@
++package oop.ex6.main;
++
++import java.util.function.Predicate;
++import java.util.function.Supplier;
++
++public class MethodChecker {
++    private final Predicate<String> isLegalVarType;
++    private final Predicate<String> isLegalVarName;
++    private final Supplier<String> variableNamePattern;
++    private static final String METHOD_DECLARATION_RETURN_TYPE_PATTERN = "void";
++    private static final String METHOD_NAME_PATTERN = "^(?!(_|\\d))\\w+";
++    private static final String METHOD_DECLARATION_PARAMETERS_PATTERN = "\\((\\s*\\w+\\s\\w+)(,\\s\\w+\\s\\w+)*\\)";
++    private static final String METHOD_DECLARATION_INIT_PATTERN =
++            "^\\s*" + METHOD_DECLARATION_RETURN_TYPE_PATTERN + "\\s+" + METHOD_NAME_PATTERN +
++                    "\\s*" + METHOD_DECLARATION_PARAMETERS_PATTERN + "\\s*\\{";
++    private static final String SINGLE_PARAMETER_DECLARATION_DELIMITER = "\\s";
++    private static final String PARAMETERS_DECLARATION_DELIMITER = "\\(|,\\s|\\)";
++    private final String METHOD_CALLING_PARAMETERS_PATTERN;
++    private static final String METHOD_CALLING_PATTERN = "\\b" + METHOD_NAME_PATTERN + "\\s+";
++
++    public MethodChecker(Supplier<String> variableNamePattern, Predicate<String> isLegalVarType,
++                         Predicate<String> isLegalVarName) {
++        this.variableNamePattern = variableNamePattern;
++        this.isLegalVarType = isLegalVarType;
++        this.isLegalVarName = isLegalVarName;
++//        METHOD_CALLING_PARAMETERS_PATTERN = "\\(\\s*" + variableNamePattern.get() ;
++    }
++
++    /**
++     * A method that verifies whether a single line contains a method declaration pattern of the form:
++     *      "returnType methodName (parameters) {".
++     * @param line the line to evaluate.
++     * @return true if correct, false otherwise.
++     */
++    public boolean hasMethodDeclarationPattern(String line) {return line.matches(METHOD_DECLARATION_INIT_PATTERN);}
++
++    /**
++     * A method that verifies whether the method returns a legal type.
++     * In the case of the current exercise, the method shouldn't return anything and therefore should have
++     * void as its returnType.
++     * @param returnType the method return type.
++     * @return true if correct, false otherwise.
++     */
++    public boolean isLegalMethodDeclarationReturnType(String returnType) {
++        return returnType.matches(METHOD_DECLARATION_RETURN_TYPE_PATTERN);
++    }
++
++    /**
++     * A method that verifies whether the argument corresponds to a legal method name (i.e. starting with letters).
++     * @param name the method name to verify.
++     * @return true if correct, false otherwise.
++     */
++    public boolean isLegalMethodDeclarationName(String name) {return name.matches(METHOD_NAME_PATTERN);}
++
++
++    public boolean hasLegalMethodDeclarationParameters(String parameters) {
++        if(parameters.matches(METHOD_DECLARATION_PARAMETERS_PATTERN)) {
++            String[] singleParameters = parameters.split(PARAMETERS_DECLARATION_DELIMITER);
++            for(String singleParameter : singleParameters) {
++                if(!isLegalMethodDeclarationParameter(singleParameter))
++                    return false;
++            }
++            return true;
++        }
++        return false;
++    }
++
++    public boolean isLegalMethodDeclarationParameter(String parameter) {
++        String[] delimitedParameter = parameter.split(SINGLE_PARAMETER_DECLARATION_DELIMITER);
++        String type = delimitedParameter[0];
++        String name = delimitedParameter[1];
++        return isLegalVarType.test(type) && isLegalVarName.test(name);
++    }
++}
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"27397662-d302-41b9-8131-0f0e485311c3\" name=\"Changes\" comment=\"Shower muza\">\r\n      <change afterPath=\"$PROJECT_DIR$/.idea/uiDesigner.xml\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/src/oop/ex6/main/FunctionTable.java\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/src/oop/ex6/main/Tokenizer.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/oop/ex6/main/CorrectnessChecker.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/oop/ex6/main/CorrectnessChecker.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/oop/ex6/main/Sjavac.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/oop/ex6/main/Sjavac.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/oop/ex6/main/VarTable.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/oop/ex6/main/VarTable.java\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"CodeStyleSettingsInfer\">\r\n    <option name=\"done\" value=\"true\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Class\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"MarkdownSettingsMigration\">\r\n    <option name=\"stateVersion\" value=\"1\" />\r\n  </component>\r\n  <component name=\"ProjectCodeStyleSettingsMigration\">\r\n    <option name=\"version\" value=\"2\" />\r\n  </component>\r\n  <component name=\"ProjectId\" id=\"2KDUqFUh1pz4OKg4VuOfYawPLKd\" />\r\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\">\r\n    <ConfirmationsSetting value=\"2\" id=\"Add\" />\r\n  </component>\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"RunOnceActivity.OpenProjectViewOnStart\": \"true\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"SHARE_PROJECT_CONFIGURATION_FILES\": \"true\",\r\n    \"WebServerToolWindowFactoryState\": \"false\",\r\n    \"dart.analysis.tool.window.visible\": \"false\",\r\n    \"node.js.detected.package.eslint\": \"true\",\r\n    \"node.js.detected.package.tslint\": \"true\",\r\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\r\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\r\n    \"nodejs_package_manager_path\": \"npm\",\r\n    \"project.structure.last.edited\": \"Modules\",\r\n    \"project.structure.proportion\": \"0.15\",\r\n    \"project.structure.side.proportion\": \"0.2\",\r\n    \"show.migrate.to.gradle.popup\": \"false\",\r\n    \"vue.rearranger.settings.migration\": \"true\"\r\n  }\r\n}]]></component>\r\n  <component name=\"RunManager\">\r\n    <configuration name=\"Unnamed\" type=\"Application\" factoryName=\"Application\" nameIsGenerated=\"true\">\r\n      <option name=\"MAIN_CLASS_NAME\" value=\"oop.ex6.main.Sjavac\" />\r\n      <module name=\"ex6\" />\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"27397662-d302-41b9-8131-0f0e485311c3\" name=\"Changes\" comment=\"\" />\r\n      <created>1673508840689</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1673508840689</updated>\r\n      <workItem from=\"1673508842767\" duration=\"433000\" />\r\n      <workItem from=\"1673509283810\" duration=\"558000\" />\r\n    </task>\r\n    <task id=\"LOCAL\u200E-00001\" summary=\"added classes\">\r\n      <created>1673551477090</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL\u200E-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\u200E\" />\r\n      <updated>1673551477090</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"2\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State />\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"added classes\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"added classes\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision f2e08f4c028b574ec663f1bca28e651fc76073aa)
++++ b/.idea/workspace.xml	(date 1673756788833)
+@@ -4,15 +4,9 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="27397662-d302-41b9-8131-0f0e485311c3" name="Changes" comment="Shower muza">
+-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/oop/ex6/main/FunctionTable.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/oop/ex6/main/Tokenizer.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java" afterDir="false" />
++    <list default="true" id="27397662-d302-41b9-8131-0f0e485311c3" name="Changes" comment="Handling of method type, method name, and method parameters.">
++      <change afterPath="$PROJECT_DIR$/src/oop/ex6/main/MethodChecker.java" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/CorrectnessChecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/CorrectnessChecker.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/Sjavac.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/Sjavac.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/VarTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/VarTable.java" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -46,25 +40,25 @@
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent"><![CDATA[{
+-  "keyToString": {
+-    "RunOnceActivity.OpenProjectViewOnStart": "true",
+-    "RunOnceActivity.ShowReadmeOnStart": "true",
+-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+-    "WebServerToolWindowFactoryState": "false",
+-    "dart.analysis.tool.window.visible": "false",
+-    "node.js.detected.package.eslint": "true",
+-    "node.js.detected.package.tslint": "true",
+-    "node.js.selected.package.eslint": "(autodetect)",
+-    "node.js.selected.package.tslint": "(autodetect)",
+-    "nodejs_package_manager_path": "npm",
+-    "project.structure.last.edited": "Modules",
+-    "project.structure.proportion": "0.15",
+-    "project.structure.side.proportion": "0.2",
+-    "show.migrate.to.gradle.popup": "false",
+-    "vue.rearranger.settings.migration": "true"
++  <component name="PropertiesComponent">{
++  &quot;keyToString&quot;: {
++    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
++    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
++    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
++    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
++    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
++    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
++    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
++    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
++    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
++    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
++    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
++    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
++    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;,
++    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+   }
+-}]]></component>
++}</component>
+   <component name="RunManager">
+     <configuration name="Unnamed" type="Application" factoryName="Application" nameIsGenerated="true">
+       <option name="MAIN_CLASS_NAME" value="oop.ex6.main.Sjavac" />
+@@ -111,6 +105,7 @@
+   </component>
+   <component name="VcsManagerConfiguration">
+     <MESSAGE value="added classes" />
+-    <option name="LAST_COMMIT_MESSAGE" value="added classes" />
++    <MESSAGE value="Handling of method type, method name, and method parameters." />
++    <option name="LAST_COMMIT_MESSAGE" value="Handling of method type, method name, and method parameters." />
+   </component>
+ </project>
+\ No newline at end of file

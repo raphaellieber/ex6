@@ -1,0 +1,273 @@
+Index: src/oop/ex6/main/Sjavac.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package oop.ex6.main;\r\n\r\nimport java.io.BufferedReader;\r\nimport java.io.FileReader;\r\nimport java.io.IOException;\r\nimport java.util.StringTokenizer;\r\n\r\npublic class Sjavac {\r\n    static final int SUCCESS = 0;\r\n    static final int FAILURE = 1;\r\n    static final int IO_ERROR = 2;\r\n\r\n    public static int compileFile(String filePath) {\r\n        try (\r\n            FileReader fileReader = new FileReader(filePath);\r\n            BufferedReader bufferedReader = new BufferedReader(fileReader)) {\r\n\r\n            CorrectnessChecker correctnessChecker = new CorrectnessChecker();\r\n            VarTable varTable = new VarTable();\r\n            FunctionTable functionTable = new FunctionTable();\r\n\r\n            CompilationEngine compilationEngine = new CompilationEngine (correctnessChecker, varTable,\r\n                    functionTable  ,bufferedReader);\r\n\r\n            compilationEngine.compile();\r\n\r\n\r\n        } catch (IOException e) {\r\n            System.out.println(\"File was not found or can't be open\");\r\n            return IO_ERROR;\r\n        }\r\n\r\n        return SUCCESS;\r\n    }\r\n\r\n    public static void main(String[] args) {\r\n//\r\n//        if (args.length == 0) {\r\n//            System.out.println(\"No file path given\");\r\n//            return FAILURE;\r\n//        }\r\n//\r\n//        String filePath = args[0];\r\n//        return compileFile(filePath);\r\n\r\n        String str = \"a=5;\";\r\n        StringTokenizer tokenizer = new StringTokenizer(str);\r\n        while (tokenizer.hasMoreTokens()) {\r\n            System.out.println(tokenizer.nextToken());\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/oop/ex6/main/Sjavac.java b/src/oop/ex6/main/Sjavac.java
+--- a/src/oop/ex6/main/Sjavac.java	
++++ b/src/oop/ex6/main/Sjavac.java	
+@@ -1,5 +1,8 @@
+ package oop.ex6.main;
+ 
++import oop.ex6.main.function.handling.FunctionTable;
++import oop.ex6.main.var.handling.VarTable;
++
+ import java.io.BufferedReader;
+ import java.io.FileReader;
+ import java.io.IOException;
+Index: src/oop/ex6/main/CorrectnessChecker.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package oop.ex6.main;\r\n\r\n// todo should we use pattern and matcher or use the functionally of string.matches is okay??\r\n\r\n\r\n// TYPES = [\"int\", \"double\", \"String\", \"boolean\", \"char\"]\r\n// var name - \"^(?!\\d)[_]{1,}\\w+|[A-Za-z]+\\w*\"\r\n// int value - \"^[-+]{0,1}\\d+\"\r\n// double value = \"^[-+]{0,1}\\d+.{0,1}\\d*|[-+]{0,1}\\d*.{0,1}\\d+\"\r\n// boolean value = \"true|false|^[-+]{0,1}\\d+.{0,1}\\d*|[-+]{0,1}\\d*.{0,1}\\d+\"\r\n// string value = \"^\"[\\w\\W]*\"\"\r\n// char Value = \"^'[\\w\\W]{1}'\"\r\n\r\npublic class CorrectnessChecker {\r\n\r\n    //    private static final String VAR_NAME = \"^(?!\\\\d)_+\\\\w+|[A-Za-z]+\\\\w*\";\r\n    private static final String VAR_NAME = \"^(?!(_(?!\\\\w)|\\\\d))\\\\w+\";\r\n    private static final String PARAMETERS_DELIMITER = \"\\\\(|,\\\\s|\\\\)\";\r\n    private static final String METHOD_NAME = \"^(?!(_|\\\\d))\\\\w+\";\r\n    private static final String METHOD_PARAMETERS = \"\\\\((\\\\w+\\\\s\\\\w+)(,\\\\s\\\\w+\\\\s\\\\w+)*\\\\)\";\r\n    private static final String SINGLE_PARAMETER_DELIMITER = \"\\\\s\";\r\n\r\n    // values regex\r\n    private static final String INT_VALUE = \"^[-+]?\\\\d+\";\r\n    private static final String DOUBLE_VALUE = \"^[-+]?\\\\d+.?\\\\d*|[-+]?\\\\d*.?\\\\d+\";\r\n    private static final String BOOLEAN_VALUE = \"true|false|^[-+]?\\\\d+.?\\\\d*|[-+]?\\\\d*.?\\\\d+\";\r\n    private static final String STRING_VALUE = \"^\\\"[\\\\w\\\\W]*\\\"\";\r\n    private static final String CHAR_VALUE = \"^'[\\\\w\\\\W]'\";\r\n\r\n    // line correctness regex\r\n    private static final String COMMENT_START = \"//\";\r\n    private static final String SPACES = \"^\\\\s+\";\r\n    private static final String ONLY_END_SEMICOLON_REGEX = \"^[^;]*;$\";\r\n\r\n    private static final String INT = \"int\";\r\n    private static final String DOUBLE = \"double\";\r\n    private static final String BOOLEAN = \"boolean\";\r\n    private static final String STRING = \"String\";\r\n    private static final String CHAR = \"char\";\r\n\r\n    private static final String VOID = \"void\";\r\n\r\n\r\n    /**\r\n     * A method that verifies whether the argument corresponds to a legal variable name (i.e. starting with letters\r\n     * or with an underscore followed by any character).\r\n     * @param name the variable name to verify.\r\n     * @return ture if correct, false otherwise.\r\n     */\r\n    public boolean isLegalVarName(String name) {return name.matches(VAR_NAME); }\r\n\r\n    /**\r\n     * A function that checks the value correctness depends on a type\r\n     * @param type represents the type, can get: int, double, boolean, String, char\r\n     * @param value represents the value\r\n     * @return true if correct, false otherwise (as well if the given type don't match)\r\n     */\r\n    public  boolean isLegalValue(String type, String value) {\r\n\r\n        switch (type){\r\n            case INT: return value.matches(INT_VALUE);\r\n            case DOUBLE: return value.matches(DOUBLE_VALUE);\r\n            case BOOLEAN: return value.matches(BOOLEAN_VALUE);\r\n            case STRING: return value.matches(STRING_VALUE);\r\n            case CHAR: return value.matches(CHAR_VALUE);\r\n        }\r\n\r\n        // if the type didn't match\r\n        return false;\r\n    }\r\n\r\n    /**\r\n     * A method that checks the validity of a given varType\r\n     * @param varType represents the given var type\r\n     * @return return true is valid, false otherwise\r\n     */\r\n    public  boolean isLegalVarType(String varType) {\r\n        return varType.equals(INT) | varType.equals(DOUBLE) | varType.equals(CHAR) | varType.equals(STRING) |\r\n                varType.equals(BOOLEAN);\r\n    }\r\n\r\n    public  boolean lineToIgnore(String line){\r\n        return line.startsWith(COMMENT_START) | line.matches(SPACES);\r\n    }\r\n\r\n    /**\r\n     * A method that verifies whether the argument corresponds to a legal method name (i.e. starting with letters).\r\n     * @param name the method name to verify.\r\n     * @return true if correct, false otherwise.\r\n     */\r\n    public  boolean isLegalMethodName(String name) {return name.matches(METHOD_NAME);}\r\n\r\n    /**\r\n     * A method that verifies whether the method returns a legal type.\r\n     * In the case of the current exercise, the method shouldn't return anything and therefore should have\r\n     * void as its returType.\r\n     * @param returnType the method return type.\r\n     * @return true if correct, false otherwise.\r\n     */\r\n    public  boolean isLegalMethodReturnType(String returnType) {return returnType.equals(VOID);}\r\n\r\n    public  boolean isLegalMethodParameter(String parameter) {\r\n        String[] delimitedParameter = parameter.split(SINGLE_PARAMETER_DELIMITER);\r\n        String type = delimitedParameter[0];\r\n        String name = delimitedParameter[1];\r\n        return isLegalVarType(type) && isLegalVarName(name);\r\n    }\r\n\r\n    public  boolean hasLegalMethodParameters(String parameters) {\r\n        if(parameters.matches(METHOD_PARAMETERS)) {\r\n            String[] singleParameters = parameters.split(PARAMETERS_DELIMITER);\r\n            for(String singleParameter : singleParameters) {\r\n                if(!isLegalMethodParameter(singleParameter))\r\n                    return false;\r\n            }\r\n            return true;\r\n        }\r\n        return false;\r\n    }\r\n\r\n    /**\r\n     * A method that checks if the line ends legally - with semicolon (;) and has only one semicolon\r\n     * @param line represents the given line\r\n     * @return true if legal, false otherwise\r\n     */\r\n    public boolean isLegalEndOfLine(String line) {\r\n        return line.matches(ONLY_END_SEMICOLON_REGEX);\r\n    }\r\n\r\n\r\n\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/oop/ex6/main/CorrectnessChecker.java b/src/oop/ex6/main/CorrectnessChecker.java
+--- a/src/oop/ex6/main/CorrectnessChecker.java	
++++ b/src/oop/ex6/main/CorrectnessChecker.java	
+@@ -13,9 +13,9 @@
+ 
+ public class CorrectnessChecker {
+ 
+-    //    private static final String VAR_NAME = "^(?!\\d)_+\\w+|[A-Za-z]+\\w*";
+     private static final String VAR_NAME = "^(?!(_(?!\\w)|\\d))\\w+";
+     private static final String PARAMETERS_DELIMITER = "\\(|,\\s|\\)";
++    private static final String METHOD_GENERIC_PATTERN = "\\w+\\s+\\w+\\s*\\(.*\\)\\s*\\{";
+     private static final String METHOD_NAME = "^(?!(_|\\d))\\w+";
+     private static final String METHOD_PARAMETERS = "\\((\\w+\\s\\w+)(,\\s\\w+\\s\\w+)*\\)";
+     private static final String SINGLE_PARAMETER_DELIMITER = "\\s";
+@@ -83,6 +83,14 @@
+         return line.startsWith(COMMENT_START) | line.matches(SPACES);
+     }
+ 
++    /**
++     * A method that verifies whether a single line contains a method declaration pattern of the form:
++     *      "returnType methodName (parameters) {".
++     * @param line the line to evaluate.
++     * @return true if correct, false otherwise.
++     */
++    public boolean hasMethodDeclarationPattern(String line) {return line.matches(METHOD_GENERIC_PATTERN);}
++
+     /**
+      * A method that verifies whether the argument corresponds to a legal method name (i.e. starting with letters).
+      * @param name the method name to verify.
+@@ -93,7 +101,7 @@
+     /**
+      * A method that verifies whether the method returns a legal type.
+      * In the case of the current exercise, the method shouldn't return anything and therefore should have
+-     * void as its returType.
++     * void as its returnType.
+      * @param returnType the method return type.
+      * @return true if correct, false otherwise.
+      */
+Index: src/oop/ex6/main/CompilationEngine.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package oop.ex6.main;\r\n\r\nimport oop.ex6.main.function.handling.FunctionTable;\r\nimport oop.ex6.main.var.handling.VarTable;\r\n\r\nimport java.io.BufferedReader;\r\nimport java.io.IOException;\r\nimport java.util.ArrayList;\r\n\r\npublic class CompilationEngine {\r\n\r\n    // saved keywords:\r\n    private static final String INT = \"int\";\r\n    private static final String DOUBLE = \"double\";\r\n    private static final String BOOLEAN = \"boolean\";\r\n    private static final String STRING = \"String\";\r\n    private static final String CHAR = \"char\";\r\n    private static final String FINAL = \"final\";\r\n    private static final String VOID = \"void\";\r\n    private static final String WHILE = \"while\";\r\n    private static final String IF = \"if\";\r\n\r\n    private static final String FUNC_DECLARATION_START = \"void \";\r\n    private static final String ROUND_OPEN_BRACE = \"(\";\r\n    private static final String ROUND_CLOSE_BRACE = \")\";\r\n    private static final String CURLY_OPEN_BRACE = \"{\";\r\n    private static final String CURLY_CLOSE_BRACE = \"}\";\r\n    private static final String SPACE = \" \";\r\n    private static final String SEMICOLON = \";\";\r\n    private static final String COMMA = \",\";\r\n    private static final String EQUAL = \"=\";\r\n    private static final String FUNC_PARAM_LST_SPLIT_REGEX = \"\\\\s*,\\\\s*\";\r\n    private static final String ALL_SPACES_REGEX = \"\\\\s\";\r\n\r\n    // Exceptions messages:\r\n    private static final String WRONG_FUNC_NAME = \"Illegal function name\";\r\n    private static final String WRONG_VAR_NAME = \"Illegal var name\";\r\n    private static final String WRONG_VALUE = \"Illegal value\";\r\n    private static final String NO_AVR_NAME = \"No var name\";\r\n    private static final String WRONG_TYPE = \"Illegal var type\";\r\n    private static final String WRONG_END_OF_LINE = \"Illegal end of line\";\r\n    private static final String ILLEGAL_DECLARATION_LINE = \"Illegal declaration line\";\r\n\r\n    private static final ArrayList<String> DECLARATION_TYPES = new ArrayList<>() {\r\n        {\r\n            add(INT);\r\n            add(DOUBLE);\r\n            add(BOOLEAN);\r\n            add(STRING);\r\n            add(CHAR);\r\n            add(FINAL);\r\n        }\r\n    };\r\n\r\n\r\n\r\n    private final CorrectnessChecker correctnessChecker;\r\n    private final VarTable varTable;\r\n    private final FunctionTable functionTable;\r\n    private final BufferedReader reader;\r\n    private Tokenizer tokenizer;\r\n\r\n    public CompilationEngine (CorrectnessChecker correctnessChecker, VarTable varTable, FunctionTable functionTable,\r\n                       BufferedReader reader) throws IDENTIFIERException, IOException, SYNTAXException {\r\n        this.correctnessChecker = correctnessChecker;\r\n        this.varTable = varTable;\r\n        this.functionTable = functionTable;\r\n        this.reader = reader;\r\n        this.tokenizer = null;\r\n\r\n        // Initializing the function table:\r\n        initiateFuncTable();\r\n        this.reader.reset();\r\n\r\n    }\r\n\r\n    public void compile() throws IOException, SYNTAXException, VALUEException, IDENTIFIERException {\r\n\r\n        String line;\r\n\r\n        while ((line = this.reader.readLine()) != null) {\r\n            // checking if we can ignore the given line\r\n            if (!(this.correctnessChecker.lineToIgnore(line))) {compileLine(line);}\r\n        }\r\n    }\r\n\r\n    private void compileLine(String line) throws SYNTAXException, VALUEException, IDENTIFIERException {\r\n        while (!line.equals(\"\")) {\r\n            int firstSpace = line.indexOf(SPACE);\r\n            String firstWord = line.substring(0, firstSpace);\r\n\r\n            String curToken = tokenizer.getCurToken();\r\n\r\n            // compiling declaration line\r\n            if (DECLARATION_TYPES.contains(curToken)) { compileDeclaration(line); }\r\n\r\n            // compiling writing of a function\r\n            if (curToken.equals(VOID)) { compileFunction(); }\r\n\r\n            // if/while statement\r\n            if(curToken.equals(IF) | curToken.equals(WHILE)) { compileIfWhileStatement(); }\r\n\r\n\r\n        }\r\n\r\n\r\n    }\r\n\r\n    private void compileDeclaration(String line) throws SYNTAXException, VALUEException, IDENTIFIERException {\r\n        boolean finalOrNot = false;\r\n\r\n        if (line.startsWith(FINAL)) {\r\n            finalOrNot = true;\r\n\r\n            // checking for valid line beginning (should start with final + \" \"+)\r\n            int firstSpaceInd = line.indexOf(SPACE);\r\n            if (firstSpaceInd == -1) {throw new SYNTAXException(ILLEGAL_DECLARATION_LINE);}\r\n\r\n            // line now should start with the name of the type\r\n            line = line.substring(firstSpaceInd + 1).trim();\r\n        }\r\n\r\n        // checking validity of line beginning and end\r\n        int firstSpaceInd = line.indexOf(SPACE);\r\n        int endOfLine = line.indexOf(SEMICOLON);\r\n\r\n        if (firstSpaceInd == -1 | endOfLine == -1 | !this.correctnessChecker.isLegalEndOfLine(line)) {\r\n            throw new SYNTAXException(ILLEGAL_DECLARATION_LINE);\r\n        }\r\n\r\n        // type check\r\n        String type = line.substring(0, firstSpaceInd);\r\n        if (!this.correctnessChecker.isLegalVarType(type)) {throw new SYNTAXException(WRONG_TYPE);}\r\n\r\n        line = line.substring(firstSpaceInd + 1, endOfLine);\r\n        line = line.replaceAll(ALL_SPACES_REGEX, \"\");\r\n        compileDeclarationParams(finalOrNot, type, line);\r\n\r\n    }\r\n\r\n    private void compileDeclarationParams(boolean finalOrNot, String type, String line)\r\n            throws SYNTAXException, VALUEException, IDENTIFIERException {\r\n\r\n        String[] split = line.split(COMMA);\r\n\r\n        // length should be at least one, otherwise there is no var name in declaration line\r\n        if (split.length < 1) {throw new SYNTAXException(NO_AVR_NAME);}\r\n\r\n        for (String str: split){\r\n            int equal = str.indexOf(EQUAL);\r\n            String value = null;\r\n            String name = str;\r\n\r\n            // str is the name of the var\r\n            if (equal != -1){\r\n                name = str.split(EQUAL)[0];\r\n                value = str.split(EQUAL)[1];\r\n\r\n                // checking value\r\n                if (!this.correctnessChecker.isLegalValue(type, value)) {\r\n                    throw new VALUEException(WRONG_VALUE);\r\n                }\r\n            }\r\n            // checking name\r\n            if (!this.correctnessChecker.isLegalVarName(name)) {\r\n                throw new IDENTIFIERException(WRONG_VAR_NAME);\r\n            }\r\n            this.varTable.addVar(name, finalOrNot, type, value);\r\n        }\r\n    }\r\n\r\n    private void compileFunction() {}\r\n\r\n    private void compileIfWhileStatement() {}\r\n\r\n//    private boolean advanceTokenizer(){\r\n//\r\n//        // checking if can advance tokenizer\r\n//        if (this.tokenizer.hasMoreTokens()) {\r\n//            this.tokenizer.advance();\r\n//            return true;\r\n//        }\r\n//\r\n//        return false;\r\n//\r\n//    }\r\n\r\n    private void initiateFuncTable() throws IOException, IDENTIFIERException, SYNTAXException {\r\n        String line;\r\n\r\n        while ((line = this.reader.readLine()) != null) {\r\n            if (line.startsWith(FUNC_DECLARATION_START)){\r\n                int braceStartLoc = line.indexOf(ROUND_OPEN_BRACE);\r\n                int braceFinishLoc = line.indexOf(ROUND_CLOSE_BRACE);\r\n                int spaceLoc = line.indexOf(SPACE);\r\n\r\n                // dividing into 3 sections: func name, params, end of line\r\n                String funcName = line.substring(spaceLoc,braceStartLoc).trim();\r\n                String declaration = line.substring(braceStartLoc+1, braceFinishLoc);\r\n                String endOfLine = line.substring(braceFinishLoc+1).trim();\r\n\r\n                // exception for the func name\r\n                if (!this.correctnessChecker.isLegalMethodName(funcName)) {\r\n                    throw new IDENTIFIERException(WRONG_FUNC_NAME);\r\n                }\r\n\r\n                // exception for wrong end of line\r\n                if (!endOfLine.equals(CURLY_OPEN_BRACE)) {throw new SYNTAXException(WRONG_END_OF_LINE);}\r\n\r\n                // dealing with param declaration:\r\n                ArrayList<String> paramType = declarationHelper(declaration);\r\n                this.functionTable.addFunction(funcName, paramType);\r\n            }\r\n        }\r\n    }\r\n\r\n    // todo: need to update this section according to Rephael's method class!!\r\n    private ArrayList<String> declarationHelper(String declaration) throws IDENTIFIERException {\r\n        // the result will be: type name\r\n        String[] pramTypeTmp = declaration.split(FUNC_PARAM_LST_SPLIT_REGEX);\r\n\r\n        ArrayList<String> paramType = new ArrayList<>();\r\n        for (String s: pramTypeTmp){\r\n\r\n            String type = s.split(SPACE)[0];\r\n            String name = s.split(SPACE)[1];\r\n\r\n            // throwing exceptions for var type\r\n            if (!this.correctnessChecker.isLegalVarType(type)) {\r\n                throw new IDENTIFIERException(WRONG_TYPE);\r\n            }\r\n\r\n            // throwing exceptions for var name\r\n            if (!this.correctnessChecker.isLegalVarName(name)) {\r\n                throw new IDENTIFIERException(WRONG_VAR_NAME);\r\n            }\r\n            paramType.add(s);\r\n        }\r\n        return paramType;\r\n    }\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/oop/ex6/main/CompilationEngine.java b/src/oop/ex6/main/CompilationEngine.java
+--- a/src/oop/ex6/main/CompilationEngine.java	
++++ b/src/oop/ex6/main/CompilationEngine.java	
+@@ -74,7 +74,7 @@
+ 
+     }
+ 
+-    public void compile() throws IOException, SYNTAXException, VALUEException, IDENTIFIERException {
++    public void compile() throws IOException, SYNTAXException, ValueException, IDENTIFIERException {
+ 
+         String line;
+ 
+@@ -84,7 +84,7 @@
+         }
+     }
+ 
+-    private void compileLine(String line) throws SYNTAXException, VALUEException, IDENTIFIERException {
++    private void compileLine(String line) throws SYNTAXException, ValueException, IDENTIFIERException {
+         while (!line.equals("")) {
+             int firstSpace = line.indexOf(SPACE);
+             String firstWord = line.substring(0, firstSpace);
+@@ -106,7 +106,7 @@
+ 
+     }
+ 
+-    private void compileDeclaration(String line) throws SYNTAXException, VALUEException, IDENTIFIERException {
++    private void compileDeclaration(String line) throws SYNTAXException, ValueException, IDENTIFIERException {
+         boolean finalOrNot = false;
+ 
+         if (line.startsWith(FINAL)) {
+@@ -139,7 +139,7 @@
+     }
+ 
+     private void compileDeclarationParams(boolean finalOrNot, String type, String line)
+-            throws SYNTAXException, VALUEException, IDENTIFIERException {
++            throws SYNTAXException, ValueException, IDENTIFIERException {
+ 
+         String[] split = line.split(COMMA);
+ 
+@@ -158,7 +158,7 @@
+ 
+                 // checking value
+                 if (!this.correctnessChecker.isLegalValue(type, value)) {
+-                    throw new VALUEException(WRONG_VALUE);
++                    throw new ValueException(WRONG_VALUE);
+                 }
+             }
+             // checking name
+Index: src/oop/ex6/main/MethodChecker.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/oop/ex6/main/MethodChecker.java b/src/oop/ex6/main/MethodChecker.java
+new file mode 100644
+--- /dev/null	
++++ b/src/oop/ex6/main/MethodChecker.java	
+@@ -0,0 +1,76 @@
++package oop.ex6.main;
++
++import java.util.function.Predicate;
++import java.util.function.Supplier;
++
++public class MethodChecker {
++    private final Predicate<String> isLegalVarType;
++    private final Predicate<String> isLegalVarName;
++    private final Supplier<String> variableNamePattern;
++    private static final String METHOD_DECLARATION_RETURN_TYPE_PATTERN = "void";
++    private static final String METHOD_NAME_PATTERN = "^(?!(_|\\d))\\w+";
++    private static final String METHOD_DECLARATION_PARAMETERS_PATTERN = "\\((\\s*\\w+\\s\\w+)(,\\s\\w+\\s\\w+)*\\)";
++    private static final String METHOD_DECLARATION_INIT_PATTERN =
++            "^\\s*" + METHOD_DECLARATION_RETURN_TYPE_PATTERN + "\\s+" + METHOD_NAME_PATTERN +
++                    "\\s*" + METHOD_DECLARATION_PARAMETERS_PATTERN + "\\s*\\{";
++    private static final String SINGLE_PARAMETER_DECLARATION_DELIMITER = "\\s";
++    private static final String PARAMETERS_DECLARATION_DELIMITER = "\\(|,\\s|\\)";
++    private static final String METHOD_CALLING_PATTERN = "\\b" + METHOD_NAME_PATTERN + "\\s+";
++    private final String methodCallingParametersPattern;
++
++    public MethodChecker(Supplier<String> variableNamePattern, Predicate<String> isLegalVarType,
++                         Predicate<String> isLegalVarName) {
++        this.variableNamePattern = variableNamePattern;
++        this.isLegalVarType = isLegalVarType;
++        this.isLegalVarName = isLegalVarName;
++        methodCallingParametersPattern = "\\(\\s*" + variableNamePattern.get() + "(\\s*,)";
++        String temp = "\\(\\s*(" + variableNamePattern.get() + "\\s*(,\\s*" +
++                variableNamePattern.get() + "\\s*)*\\s*)??\\)";
++    }
++
++    /**
++     * A method that verifies whether a single line contains a method declaration pattern of the form:
++     *      "returnType methodName (parameters) {".
++     * @param line the line to evaluate.
++     * @return true if correct, false otherwise.
++     */
++    public boolean hasMethodDeclarationPattern(String line) {return line.matches(METHOD_DECLARATION_INIT_PATTERN);}
++
++    /**
++     * A method that verifies whether the method returns a legal type.
++     * In the case of the current exercise, the method shouldn't return anything and therefore should have
++     * void as its returnType.
++     * @param returnType the method return type.
++     * @return true if correct, false otherwise.
++     */
++    public boolean isLegalMethodDeclarationReturnType(String returnType) {
++        return returnType.matches(METHOD_DECLARATION_RETURN_TYPE_PATTERN);
++    }
++
++    /**
++     * A method that verifies whether the argument corresponds to a legal method name (i.e. starting with letters).
++     * @param name the method name to verify.
++     * @return true if correct, false otherwise.
++     */
++    public boolean isLegalMethodDeclarationName(String name) {return name.matches(METHOD_NAME_PATTERN);}
++
++
++    public boolean hasLegalMethodDeclarationParameters(String parameters) {
++        if(parameters.matches(METHOD_DECLARATION_PARAMETERS_PATTERN)) {
++            String[] singleParameters = parameters.split(PARAMETERS_DECLARATION_DELIMITER);
++            for(String singleParameter : singleParameters) {
++                if(!isLegalMethodDeclarationParameter(singleParameter))
++                    return false;
++            }
++            return true;
++        }
++        return false;
++    }
++
++    public boolean isLegalMethodDeclarationParameter(String parameter) {
++        String[] delimitedParameter = parameter.split(SINGLE_PARAMETER_DECLARATION_DELIMITER);
++        String type = delimitedParameter[0];
++        String name = delimitedParameter[1];
++        return isLegalVarType.test(type) && isLegalVarName.test(name);
++    }
++}
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"27397662-d302-41b9-8131-0f0e485311c3\" name=\"Changes\" comment=\"added packages: varHandling and Function handling&#10;added Var class (similar to the method class)&#10;made some minor changes in the VarTable class -&gt; made it simpler&#10;added exception handling to the initiateFuncTable function\">\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/oop/ex6/main/CorrectnessChecker.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/oop/ex6/main/CorrectnessChecker.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/oop/ex6/main/Sjavac.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/oop/ex6/main/Sjavac.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/oop/ex6/main/var/handling/Var.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/oop/ex6/main/var/handling/Var.java\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"CodeStyleSettingsInfer\">\r\n    <option name=\"done\" value=\"true\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Class\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"MarkdownSettingsMigration\">\r\n    <option name=\"stateVersion\" value=\"1\" />\r\n  </component>\r\n  <component name=\"ProjectCodeStyleSettingsMigration\">\r\n    <option name=\"version\" value=\"2\" />\r\n  </component>\r\n  <component name=\"ProjectId\" id=\"2KDUqFUh1pz4OKg4VuOfYawPLKd\" />\r\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\">\r\n    <ConfirmationsSetting value=\"2\" id=\"Add\" />\r\n  </component>\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"RunOnceActivity.OpenProjectViewOnStart\": \"true\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"SHARE_PROJECT_CONFIGURATION_FILES\": \"true\",\r\n    \"WebServerToolWindowFactoryState\": \"false\",\r\n    \"dart.analysis.tool.window.visible\": \"false\",\r\n    \"node.js.detected.package.eslint\": \"true\",\r\n    \"node.js.detected.package.tslint\": \"true\",\r\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\r\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\r\n    \"nodejs_package_manager_path\": \"npm\",\r\n    \"project.structure.last.edited\": \"Modules\",\r\n    \"project.structure.proportion\": \"0.15\",\r\n    \"project.structure.side.proportion\": \"0.2\",\r\n    \"show.migrate.to.gradle.popup\": \"false\",\r\n    \"vue.rearranger.settings.migration\": \"true\"\r\n  }\r\n}]]></component>\r\n  <component name=\"RunManager\">\r\n    <configuration name=\"Unnamed\" type=\"Application\" factoryName=\"Application\" nameIsGenerated=\"true\">\r\n      <option name=\"MAIN_CLASS_NAME\" value=\"oop.ex6.main.Sjavac\" />\r\n      <module name=\"ex6\" />\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"27397662-d302-41b9-8131-0f0e485311c3\" name=\"Changes\" comment=\"\" />\r\n      <created>1673508840689</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1673508840689</updated>\r\n      <workItem from=\"1673508842767\" duration=\"433000\" />\r\n      <workItem from=\"1673509283810\" duration=\"558000\" />\r\n    </task>\r\n    <task id=\"LOCAL\u200E-00001\" summary=\"added classes\">\r\n      <created>1673551477090</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL\u200E-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\u200E\" />\r\n      <updated>1673551477090</updated>\r\n    </task>\r\n    <task id=\"LOCAL\u200E-00002\" summary=\"some updates\">\r\n      <created>1673711522114</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL\u200E-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\u200E\" />\r\n      <updated>1673711522114</updated>\r\n    </task>\r\n    <task id=\"LOCAL\u200E-00003\" summary=\"exception classes\">\r\n      <created>1673719322244</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL\u200E-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\u200E\" />\r\n      <updated>1673719322244</updated>\r\n    </task>\r\n    <task id=\"LOCAL\u200E-00004\" summary=\"added packages: varHandling and Function handling&#10;added Var class (similar to the method class)&#10;made some minor changes in the VarTable class -&gt; made it simpler&#10;added exception handling to the initiateFuncTable function\">\r\n      <created>1673785226517</created>\r\n      <option name=\"number\" value=\"00004\" />\r\n      <option name=\"presentableId\" value=\"LOCAL\u200E-00004\" />\r\n      <option name=\"project\" value=\"LOCAL\u200E\" />\r\n      <updated>1673785226517</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"5\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State />\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"added classes\" />\r\n    <MESSAGE value=\"some updates\" />\r\n    <MESSAGE value=\"exception classes\" />\r\n    <MESSAGE value=\"added packages: varHandling and Function handling&#10;added Var class (similar to the method class)&#10;made some minor changes in the VarTable class -&gt; made it simpler&#10;added exception handling to the initiateFuncTable function\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"added packages: varHandling and Function handling&#10;added Var class (similar to the method class)&#10;made some minor changes in the VarTable class -&gt; made it simpler&#10;added exception handling to the initiateFuncTable function\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	
++++ b/.idea/workspace.xml	
+@@ -5,11 +5,12 @@
+   </component>
+   <component name="ChangeListManager">
+     <list default="true" id="27397662-d302-41b9-8131-0f0e485311c3" name="Changes" comment="added packages: varHandling and Function handling&#10;added Var class (similar to the method class)&#10;made some minor changes in the VarTable class -&gt; made it simpler&#10;added exception handling to the initiateFuncTable function">
++      <change afterPath="$PROJECT_DIR$/src/oop/ex6/main/MethodChecker.java" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/CorrectnessChecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/CorrectnessChecker.java" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/Sjavac.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/Sjavac.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/var/handling/Var.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/var/handling/Var.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/VALUEException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/ValueException.java" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -43,25 +44,25 @@
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent"><![CDATA[{
+-  "keyToString": {
+-    "RunOnceActivity.OpenProjectViewOnStart": "true",
+-    "RunOnceActivity.ShowReadmeOnStart": "true",
+-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+-    "WebServerToolWindowFactoryState": "false",
+-    "dart.analysis.tool.window.visible": "false",
+-    "node.js.detected.package.eslint": "true",
+-    "node.js.detected.package.tslint": "true",
+-    "node.js.selected.package.eslint": "(autodetect)",
+-    "node.js.selected.package.tslint": "(autodetect)",
+-    "nodejs_package_manager_path": "npm",
+-    "project.structure.last.edited": "Modules",
+-    "project.structure.proportion": "0.15",
+-    "project.structure.side.proportion": "0.2",
+-    "show.migrate.to.gradle.popup": "false",
+-    "vue.rearranger.settings.migration": "true"
++  <component name="PropertiesComponent">{
++  &quot;keyToString&quot;: {
++    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
++    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
++    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
++    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
++    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
++    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
++    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
++    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
++    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
++    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
++    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
++    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
++    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;,
++    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+   }
+-}]]></component>
++}</component>
+   <component name="RunManager">
+     <configuration name="Unnamed" type="Application" factoryName="Application" nameIsGenerated="true">
+       <option name="MAIN_CLASS_NAME" value="oop.ex6.main.Sjavac" />

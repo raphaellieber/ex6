@@ -1,0 +1,50 @@
+Index: src/oop/ex6/main/VALUEException.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/oop/ex6/main/VALUEException.java b/src/oop/ex6/main/ValueException.java
+rename from src/oop/ex6/main/VALUEException.java
+rename to src/oop/ex6/main/ValueException.java
+--- a/src/oop/ex6/main/VALUEException.java	
++++ b/src/oop/ex6/main/ValueException.java	
+@@ -1,25 +1,25 @@
+ package oop.ex6.main;
+ 
+-public class VALUEException extends Exception{
++public class ValueException extends Exception{
+ 
+     /**
+-     * Constructs a new VALUEException with {@code null} as its detail message.
++     * Constructs a new ValueException with {@code null} as its detail message.
+      * The cause is not initialized, and may subsequently be initialized by a
+      * call to {@link #initCause}.
+      */
+-    public VALUEException() {
++    public ValueException() {
+         super();
+     }
+ 
+     /**
+-     * Constructs a new VALUEException with the specified detail message.  The
++     * Constructs a new ValueException with the specified detail message.  The
+      * cause is not initialized, and may subsequently be initialized by
+      * a call to {@link #initCause}.
+      *
+      * @param   message   the detail message. The detail message is saved for
+      *          later retrieval by the {@link #getMessage()} method.
+      */
+-    public VALUEException(String message){ super(message); }
++    public ValueException(String message){ super(message); }
+ 
+     /**
+      * Constructs a new VALUEException with the specified detail message and
+@@ -34,7 +34,7 @@
+      *         permitted, and indicates that the cause is nonexistent or
+      *         unknown.)
+      */
+-    public VALUEException(String message, Throwable cause) {
++    public ValueException(String message, Throwable cause) {
+         super(message, cause);
+     }
+ 
