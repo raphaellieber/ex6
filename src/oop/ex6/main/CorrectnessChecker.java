@@ -9,6 +9,12 @@ public class CorrectnessChecker {
     private static final String METHOD_PARAMETERS = "\\((\\w+\\s\\w+)(,\\s\\w+\\s\\w+)*\\)";
     private static final String SINGLE_PARAMETER_DELIMITER = "\\s";
 
+    // if/while regex
+    private static final String GENERIC_IF_WHILE_PATTERN = "^\\s*(if|while)\\s*\\(.*\\)\\s*\\{\\n";
+    private static final String TRUE_FALSE_PATTERN = "\\(\\s*true|false\\s*\\)";
+    private static final String INITIALIZED_VAR_PATTERN = "\\(\\s*\\w+\\s*\\)";
+    private static final String VALUE_PATTERN = "\\(\\s*-?((\\d+.?\\d*)|(\\d*.?\\d+))\\s*\\)";
+
     // values regex
     private static final String INT_VALUE = "^[-+]?\\d+";
     private static final String DOUBLE_VALUE = "^[-+]?\\d+.?\\d*|[-+]?\\d*.?\\d+";
@@ -66,7 +72,7 @@ public class CorrectnessChecker {
      * @param varType represents the given var type
      * @return return true is valid, false otherwise
      */
-    public  boolean isLegalVarType(String varType) {
+    public boolean isLegalVarType(String varType) {
         return varType.equals(INT) | varType.equals(DOUBLE) | varType.equals(CHAR) | varType.equals(STRING) |
                 varType.equals(BOOLEAN);
     }
@@ -76,7 +82,7 @@ public class CorrectnessChecker {
      * @param line represents the given line
      * @return true if it can be ignored, false otherwise
      */
-    public  boolean lineToIgnore(String line){
+    public boolean lineToIgnore(String line){
         return line.startsWith(COMMENT_START) | line.matches(SPACES);
     }
 
@@ -85,7 +91,7 @@ public class CorrectnessChecker {
      * @param name the method name to verify.
      * @return true if correct, false otherwise.
      */
-    public  boolean legalMethodName(String name) {return name.matches(METHOD_NAME);}
+    public boolean legalMethodName(String name) {return name.matches(METHOD_NAME);}
 
     /**
      * A method that verifies whether the method returns a legal type.
@@ -94,16 +100,16 @@ public class CorrectnessChecker {
      * @param returnType the method return type.
      * @return true if correct, false otherwise.
      */
-    public  boolean isLegalMethodReturnType(String returnType) {return returnType.equals(VOID);}
+    public boolean isLegalMethodReturnType(String returnType) {return returnType.equals(VOID);}
 
-    public  boolean legalMethodParameter(String parameter) {
+    public boolean legalMethodParameter(String parameter) {
         String[] delimitedParameter = parameter.split(SINGLE_PARAMETER_DELIMITER);
         String type = delimitedParameter[0];
         String name = delimitedParameter[1];
         return isLegalVarType(type) && isLegalVarName(name);
     }
 
-    public  boolean hasLegalMethodParameters(String parameters) {
+    public boolean hasLegalMethodParameters(String parameters) {
         if(parameters.matches(METHOD_PARAMETERS)) {
             String[] singleParameters = parameters.split(PARAMETERS_DELIMITER);
             for(String singleParameter : singleParameters) {
@@ -135,7 +141,15 @@ public class CorrectnessChecker {
 
     public boolean legalFunctionCall(String line) { return line.matches(FUNCTION_CALL_REGEX); }
 
+    public boolean hasLegalIfWhilePattern(String line) {return line.matches(GENERIC_IF_WHILE_PATTERN);}
 
+    public boolean hasValueCondition(String condition) {
+        return condition.matches(VALUE_PATTERN);
+    }
 
+    public boolean hasTrueFalseCondition(String condition) {
+        return condition.matches(TRUE_FALSE_PATTERN);
+    }
 
+    public boolean hasInitializedVarCondition(String condition) {return condition.matches(INITIALIZED_VAR_PATTERN);}
 }

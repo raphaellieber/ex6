@@ -72,7 +72,6 @@ public class CompilationEngine {
     };
 
     private final CorrectnessChecker checker;
-    private final IfWhileChecker ifWhileChecker;
     private final VarTable varTable;
     private final FunctionTable functionTable;
     private final BufferedReader reader;
@@ -82,11 +81,10 @@ public class CompilationEngine {
     private long scopeDepthIfWhile;
     private String currentFuncName;
 
-    public CompilationEngine (CorrectnessChecker checker, IfWhileChecker ifWhileChecker, FunctionTable functionTable,
+    public CompilationEngine (CorrectnessChecker checker, FunctionTable functionTable,
                               VarTable varTable,  BufferedReader reader, BufferedReader firstRunReader)
                             throws IDENTIFIERException, IOException, SYNTAXException {
         this.checker = checker;
-        this.ifWhileChecker = ifWhileChecker;
         this.varTable = varTable;
         this.functionTable = functionTable;
         this.reader = reader;
@@ -507,6 +505,12 @@ public class CompilationEngine {
      */
     private boolean exceededMaxScopeDepth() {return this.scopeDepthIfWhile > Integer.MAX_VALUE;}
 
+    private boolean legalIfWhileInitializedVarCondition(String condition) {
+        return this.checker.hasInitializedVarCondition(condition) && varTable.varDeclared(condition) && (
+                varTable.getVarType(condition) == BOOLEAN || varTable.getVarType(condition) == DOUBLE ||
+                        varTable.getVarType(condition) == INT);
+    }
+
 
     /**
      * A method that in charge of compiling if while statement
@@ -526,8 +530,13 @@ public class CompilationEngine {
         if (!this.checker.legalEndOfIfWhileLine(line)) {throw new SYNTAXException(ILLEGAL_END_OF_LINE);}
 
         // condition check
-        if (this.ifWhileChecker.hasLegalIfWhilePattern(line)) {
-            increaseScopeDepthIfWhile();
+        if(this.checker.hasLegalIfWhilePattern(line)) {
+            int openingBracketIndex = line.indexOf("(");
+            int closingBracketIndex = line.lastIndexOf(")");
+            String condition = line.substring(openingBracketIndex, closingBracketIndex + 1);
+            if(this.checker.hasTrueFalseCondition(condition) || this.checker.hasValueCondition(condition)
+                    || legalIfWhileInitializedVarCondition(condition))
+                increaseScopeDepthIfWhile();
         }
     }
 
