@@ -40,6 +40,8 @@ public class CompilationEngine {
     private static final String ASSIGNMENT_REGEX = "^.*=.*";
     private static final String FUNCTION_CALL_REGEX = "^.*\\(.*\\).*";
 
+    private static final String CONDITION_DELIMITER = "(\\|\\|)|(&&)";
+
     // Exceptions messages:
     private static final String ILLEGAL_FUNC_NAME = "Illegal function name";
     private static final String ILLEGAL_VAR_NAME = "Illegal var name";
@@ -77,6 +79,7 @@ public class CompilationEngine {
             add(FINAL);
         }
     };
+
 
     private final CorrectnessChecker checker;
     private final VarTable varTable;
@@ -516,10 +519,23 @@ public class CompilationEngine {
      */
     private boolean exceededMaxScopeDepth() {return this.scopeDepthIfWhile > Integer.MAX_VALUE;}
 
+    private boolean hasValidIfWhileCondition(String condition) {
+        String[] conditions = condition.split(CONDITION_DELIMITER);
+        for (String singleCondition : conditions) {
+            if (!isValidSingleCondition(singleCondition))
+                return false;
+        }
+        return true;
+    }
+
+    private boolean isValidSingleCondition(String singleCondition) {
+        return this.checker.hasTrueFalseCondition(singleCondition) || this.checker.hasValueCondition(singleCondition)
+                || legalIfWhileInitializedVarCondition(singleCondition);
+    }
+
     private boolean legalIfWhileInitializedVarCondition(String condition) {
-        return this.checker.hasInitializedVarCondition(condition) & varTable.varDeclared(condition) &
-                (varTable.getVarType(condition).equals(BOOLEAN) |
-                        varTable.getVarType(condition).equals(DOUBLE) |
+        return this.checker.hasInitializedVarCondition(condition) && varTable.varDeclared(condition) && (
+                varTable.getVarType(condition).equals(BOOLEAN) | varTable.getVarType(condition).equals(DOUBLE) ||
                         varTable.getVarType(condition).equals(INT));
     }
 
@@ -541,15 +557,16 @@ public class CompilationEngine {
         if (!this.checker.hasLegalIfWhilePattern(line)) {throw new SYNTAXException(ILLEGAL_IF_WHILE_DEC);}
 
         // condition check
-        int openingBracketIndex = line.indexOf("(");
-        int closingBracketIndex = line.lastIndexOf(")");
-        String condition = line.substring(openingBracketIndex, closingBracketIndex + 1).trim();
-
-        if(this.checker.hasTrueFalseCondition(condition) | this.checker.hasValueCondition(condition)
-                | legalIfWhileInitializedVarCondition(condition)) {
-            increaseScopeDepthIfWhile();
-            this.varTable.newScope();
-            }
+        if(this.checker.hasLegalConditionPattern(line)) {
+            int openingBracketIndex = line.indexOf("(");
+            int closingBracketIndex = line.lastIndexOf(")");
+            String condition = line.substring(openingBracketIndex, closingBracketIndex + 1).trim();
+            if (checker.hasLegalConditionPattern(condition))
+                if (this.hasValidIfWhileCondition(condition)) {
+                    increaseScopeDepthIfWhile();
+                    this.varTable.newScope();
+                }
+        }
         else {throw new SYNTAXException(ILLEGAL_CONDITION); }
 
 
