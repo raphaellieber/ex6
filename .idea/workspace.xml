@@ -4,15 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="27397662-d302-41b9-8131-0f0e485311c3" name="Changes" comment="finished my part except function call -&gt; need to discuss some things&#10;fixed most of the todo things all over the code except in Raphael's part">
-      <change afterPath="$PROJECT_DIR$/src/oop/ex6/main/function/handling/Function.java" afterDir="false" />
+    <list default="true" id="6b111afd-306a-4de0-9da9-92db7b427c29" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/CorrectnessChecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/CorrectnessChecker.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/function/handling/FunctionTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/function/handling/FunctionTable.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/function/handling/Method.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/var/handling/Var.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/var/handling/Var.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/var/handling/VarTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/var/handling/VarTable.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

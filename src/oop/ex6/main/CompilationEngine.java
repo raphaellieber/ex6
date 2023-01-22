@@ -11,6 +11,8 @@ import java.util.List;
 
 public class CompilationEngine {
 
+    private int scopeDepthIfWhile = 0;
+
     // saved keywords:
     private static final String INT = "int";
     private static final String DOUBLE = "double";
@@ -48,6 +50,8 @@ public class CompilationEngine {
     private static final String ILLEGAL_END_OF_LINE = "Illegal end of line";
     private static final String ILLEGAL_DECLARATION_LINE = "Illegal declaration line";
     private static final String ILLEGAL_FUNCTION_DECLARATION = "Illegal in function - function declaration";
+    private static final String IF_WHILE_OUT_OF_METHOD = "If/While declared out of method";
+    private static final String IF_WHILE_EXCEEDING_DEPTH = "If/While statement exceeding max depth";
     private static final String ILLEGAL_IF_WHILE = "If/While declared out of function";
     private static final String ASSIGNING_FINAL_VAR = "Illegal assignment of final var";
     private static final String ILLEGAL_FUNCTION_CALL = "Illegal function call";
@@ -69,6 +73,7 @@ public class CompilationEngine {
     };
 
     private final CorrectnessChecker checker;
+    private final IfWhileChecker ifWhileChecker;
     private final VarTable varTable;
     private final FunctionTable functionTable;
     private final BufferedReader reader;
@@ -78,10 +83,11 @@ public class CompilationEngine {
     private int depthCounter;
     private String currentFuncName;
 
-    public CompilationEngine (CorrectnessChecker checker,FunctionTable functionTable,
+    public CompilationEngine (CorrectnessChecker checker, IfWhileChecker ifWhileChecker, FunctionTable functionTable,
                               VarTable varTable,  BufferedReader reader, BufferedReader firstRunReader)
                             throws IDENTIFIERException, IOException, SYNTAXException {
         this.checker = checker;
+        this.ifWhileChecker = ifWhileChecker;
         this.varTable = varTable;
         this.functionTable = functionTable;
         this.reader = reader;
@@ -96,7 +102,7 @@ public class CompilationEngine {
     }
 
     
-    public void compile() throws IOException, SYNTAXException, VALUEException, IDENTIFIERException {
+    public void compile() throws IOException, SYNTAXException, VALUEException, IDENTIFIERException, SCOPEException {
         String line;
 
         while ((line = this.reader.readLine()) != null) {
@@ -106,7 +112,7 @@ public class CompilationEngine {
     }
 
     
-    private void compileLine(String line) throws SYNTAXException, VALUEException, IDENTIFIERException {
+    private void compileLine(String line) throws SYNTAXException, VALUEException, IDENTIFIERException, SCOPEException {
         while (!line.equals("")) {
 
             int firstSpace = line.indexOf(SPACE);
@@ -140,7 +146,7 @@ public class CompilationEngine {
 
     private void compileFunctionCall(String line) throws SYNTAXException, IDENTIFIERException {
         // if function was called out of function
-        if (!this.inFuncFlag) { throw new SYNTAXException(ILLEGAL_FUNCTION_CALL);}
+        if (!inMethodScope()) { throw new SYNTAXException(ILLEGAL_FUNCTION_CALL);}
 
         // check of function call line correctness: checks for: existence of '(', ')', ';'
         if (!this.checker.legalFunctionCall(line)){ throw new SYNTAXException(ILLEGAL_FUNCTION_CALL);}
@@ -245,11 +251,11 @@ public class CompilationEngine {
         this.varTable.outOfScope();
 
         // out of if/while scope
-        if (this.depthCounter > 0) { this.depthCounter --;}
+        if (inIfWhileScope()) { decreaseIfWhileScopeDepth();}
 
         // out of function scope
-        else {
-            this.inFuncFlag = false;
+        else if(inMethodScope()) {
+            exitMethodScope();
             this.currentFuncName = null;
         }
     }
@@ -369,7 +375,7 @@ public class CompilationEngine {
         int firstSpaceLoc = line.indexOf(SPACE);
         this.currentFuncName = line.substring(firstSpaceLoc,roundOpenBraceLoc).trim();
 
-        this.inFuncFlag = true;
+        enterMethodScope();
         this.varTable.newScope();
 
         // adding func params to the var table:
@@ -377,23 +383,35 @@ public class CompilationEngine {
 
     }
 
-    
-    private void compileIfWhileStatement(String line) throws SYNTAXException {
+    private boolean inIfWhileScope() {return this.scopeDepthIfWhile > 0;}
+
+    private void increaseScopeDepthIfWhile() {this.scopeDepthIfWhile++;}
+
+    private void decreaseIfWhileScopeDepth() {this.scopeDepthIfWhile--;}
+
+    private boolean inMethodScope() {return this.inFuncFlag;}
+
+    private void enterMethodScope() {this.inFuncFlag = true;}
+
+    private void exitMethodScope() {this.inFuncFlag = false;}
+
+    private boolean exceededMaxScopeDepth() {return this.scopeDepthIfWhile > Integer.MAX_VALUE;}
+
+    private void compileIfWhileStatement(String line) throws SYNTAXException, SCOPEException {
         // if / while out of function
-        if (!this.inFuncFlag) { throw new SYNTAXException(ILLEGAL_IF_WHILE); }
+        if (!inMethodScope()) { throw new SYNTAXException(IF_WHILE_OUT_OF_METHOD); }
 
         // check if exceeded java.lang.Integer.MAX_VALUE:
-        // todo
+        if (exceededMaxScopeDepth()) { throw new SCOPEException(IF_WHILE_EXCEEDING_DEPTH);}
 
         // todo need to add ( and ) to the check
         // basic line check (checks for only one '{' and at least one '(', ')':
         if (!this.checker.legalEndOfIfWhileLine(line)) {throw new SYNTAXException(ILLEGAL_END_OF_LINE);}
 
         // condition check
-        // todo
-
-        // advancing counter of depth
-        // todo
+        if (this.ifWhileChecker.hasLegalIfWhilePattern(line)) {
+            increaseScopeDepthIfWhile();
+        }
     }
 
     
