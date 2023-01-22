@@ -11,7 +11,6 @@ import java.util.List;
 
 public class CompilationEngine {
 
-    private int scopeDepthIfWhile = 0;
 
     // saved keywords:
     private static final String INT = "int";
@@ -45,7 +44,7 @@ public class CompilationEngine {
     private static final String ILLEGAL_FUNC_NAME = "Illegal function name";
     private static final String ILLEGAL_VAR_NAME = "Illegal var name";
     private static final String ILLEGAL_VALUE = "Illegal value";
-    private static final String NO_AVR_NAME = "No var name";
+    private static final String NO_VAR_NAME = "No var name";
     private static final String ILLEGAL_TYPE = "Illegal var type";
     private static final String ILLEGAL_END_OF_LINE = "Illegal end of line";
     private static final String ILLEGAL_DECLARATION_LINE = "Illegal declaration line";
@@ -53,7 +52,7 @@ public class CompilationEngine {
     private static final String IF_WHILE_OUT_OF_METHOD = "If/While declared out of method";
     private static final String IF_WHILE_EXCEEDING_DEPTH = "If/While statement exceeding max depth";
     private static final String ILLEGAL_IF_WHILE = "If/While declared out of function";
-    private static final String ASSIGNING_FINAL_VAR = "Illegal assignment of final var";
+//    private static final String ASSIGNING_FINAL_VAR = "Illegal assignment of final var";
     private static final String ILLEGAL_FUNCTION_CALL = "Illegal function call";
     private static final String ILLEGAL_NUM_OF_PARAMS = "Given illegal number of params";
     private static final String ILLEGAL_ASSIGNMENT = "Illegal assignment of var, may be final or undeclared";
@@ -80,7 +79,7 @@ public class CompilationEngine {
     private final BufferedReader firstRunReader;
 
     private boolean inFuncFlag;
-    private int depthCounter;
+    private long scopeDepthIfWhile;
     private String currentFuncName;
 
     public CompilationEngine (CorrectnessChecker checker, IfWhileChecker ifWhileChecker, FunctionTable functionTable,
@@ -93,7 +92,7 @@ public class CompilationEngine {
         this.reader = reader;
         this.firstRunReader = firstRunReader;
         this.inFuncFlag = true;
-        this.depthCounter = 0;
+        this.scopeDepthIfWhile = 0L;
         this.currentFuncName = null;
 
         // Initializing the function table:
@@ -101,7 +100,15 @@ public class CompilationEngine {
 
     }
 
-    
+
+    /**
+     * A method that compiles the file
+     * @throws IOException Exception for using the BufferReader - can't read from the file
+     * @throws SYNTAXException Exception for wrong syntax
+     * @throws VALUEException Exception for wrong value
+     * @throws IDENTIFIERException Exception for wrong identifier (type, var name or func name)
+     * @throws SCOPEException Exception for exceeding the allowed scope depth - Integer.MAX_VALUE
+     */
     public void compile() throws IOException, SYNTAXException, VALUEException, IDENTIFIERException, SCOPEException {
         String line;
 
@@ -111,8 +118,17 @@ public class CompilationEngine {
         }
     }
 
-    
-    private void compileLine(String line) throws SYNTAXException, VALUEException, IDENTIFIERException, SCOPEException {
+
+    /**
+     * A method that compiles one line
+     * @param line represents the line
+     * @throws SYNTAXException Exception for wrong syntax
+     * @throws VALUEException Exception for wrong value
+     * @throws IDENTIFIERException Exception for wrong identifier (type, var name or func name)
+     * @throws SCOPEException Exception for exceeding the allowed scope depth - Integer.MAX_VALUE
+     */
+    private void compileLine(String line) throws SYNTAXException, VALUEException, IDENTIFIERException,
+            SCOPEException {
         while (!line.equals("")) {
 
             int firstSpace = line.indexOf(SPACE);
@@ -144,9 +160,16 @@ public class CompilationEngine {
         }
     }
 
+
+    /**
+     * A method that charge of compiling a function call
+     * @param line represents the function call line
+     * @throws SYNTAXException Exception for wrong syntax
+     * @throws IDENTIFIERException Exception for wrong identifier (type, var name or func name)
+     */
     private void compileFunctionCall(String line) throws SYNTAXException, IDENTIFIERException {
         // if function was called out of function
-        if (!inMethodScope()) { throw new SYNTAXException(ILLEGAL_FUNCTION_CALL);}
+        if (!inFunctionScope()) { throw new SYNTAXException(ILLEGAL_FUNCTION_CALL);}
 
         // check of function call line correctness: checks for: existence of '(', ')', ';'
         if (!this.checker.legalFunctionCall(line)){ throw new SYNTAXException(ILLEGAL_FUNCTION_CALL);}
@@ -173,6 +196,14 @@ public class CompilationEngine {
     }
 
 
+    /**
+     * A helper method that deals with function call param list, the method checks that all the vars are
+     * declared and makes a list of their types to compare with function param list types
+     * @param funcName represents the function name
+     * @param splitParam represents the list of params
+     * @return A list of types of the params
+     * @throws SYNTAXException Exception for wrong syntax
+     */
     private List<String> checkFuncCallParamList(String funcName, String[] splitParam) throws SYNTAXException {
 
         List<String> paramsTypeList = new ArrayList<>();
@@ -198,9 +229,18 @@ public class CompilationEngine {
     }
 
 
+    /**
+     * A method that compiles return statement
+     */
     private void compileReturnStatement() { }
 
 
+    /**
+     * A method that compiles assignment of var
+     * @param line represents the assignment line
+     * @throws VALUEException Exception for wrong value
+     * @throws SYNTAXException Exception for wrong syntax
+     */
     private void compileVarAssignment(String line) throws VALUEException, SYNTAXException {
         // checking of the validity of end of line
         if (!this.checker.legalEndOfLine(line)) { throw new SYNTAXException(ILLEGAL_END_OF_LINE);}
@@ -221,7 +261,9 @@ public class CompilationEngine {
             if (!this.varTable.setValue(varName, value)){ throw new SYNTAXException(ILLEGAL_ASSIGNMENT); }
 
             // if the value is null and reached here means that it was assigned by legal value by funcParam
-            if (value == null) { this.varTable.setAFuncParam(varName, true); }
+            if (value == null & !this.varTable.setAFuncParam(varName, true)) {
+                throw new SYNTAXException(ILLEGAL_ASSIGNMENT);
+            }
 
 //            // checking if the var declared
 //            if (!this.varTable.varDeclared(varName)) { throw new IDENTIFIERException(UNDECLARED_PARAM);}
@@ -254,13 +296,20 @@ public class CompilationEngine {
         if (inIfWhileScope()) { decreaseIfWhileScopeDepth();}
 
         // out of function scope
-        else if(inMethodScope()) {
-            exitMethodScope();
+        else if(inFunctionScope()) {
+            exitFunctionScope();
             this.currentFuncName = null;
         }
     }
 
-    
+
+    /**
+     * A method that compiles var declaration line
+     * @param line represents the declaration line
+     * @throws SYNTAXException Exception for wrong syntax
+     * @throws VALUEException Exception for wrong value
+     * @throws IDENTIFIERException Exception for wrong identifier (type, var name or func name)
+     */
     private void compileVarDeclaration(String line) throws SYNTAXException, VALUEException,
             IDENTIFIERException {
 
@@ -293,13 +342,21 @@ public class CompilationEngine {
         compileVarDeclarationParams(finalOrNot, type, line);
     }
 
-    
+    /**
+     * A helper method to the compileVarDeclaration that deals with compiling the params part
+     * @param finalOrNot represents if the params in the given line are final or not
+     * @param type represents the type of the params in the line
+     * @param line represents the params line
+     * @throws SYNTAXException Exception for wrong syntax
+     * @throws VALUEException Exception for wrong value
+     * @throws IDENTIFIERException Exception for wrong identifier (type, var name or func name)
+     */
     private void compileVarDeclarationParams(boolean finalOrNot, String type, String line)
             throws SYNTAXException, VALUEException, IDENTIFIERException {
         String[] split = line.split(COMMA);
 
         // length should be at least one, otherwise there is no var name in declaration line
-        if (split.length < 1) { throw new SYNTAXException(NO_AVR_NAME); }
+        if (split.length < 1) { throw new SYNTAXException(NO_VAR_NAME); }
 
         for (String str : split) {
             boolean funcParam = false;
@@ -329,6 +386,15 @@ public class CompilationEngine {
     }
 
 
+    /**
+     * A validity checker for a param
+     * @param finalOrNot represents if the var is final or not
+     * @param assignedByFuncParam represents if the var was assigned by a func parameter
+     * @param value represents the vars name
+     * @param name represents the vars name
+     * @throws SYNTAXException Exception for wrong syntax
+     * @throws IDENTIFIERException Exception for wrong identifier (type, var name or func name)
+     */
     private void checkVarValidityHelper(boolean finalOrNot, boolean assignedByFuncParam, String value,
                                         String name) throws SYNTAXException, IDENTIFIERException {
         // checking if the var final -> a value should be assigned or should be assigned by func param
@@ -342,11 +408,19 @@ public class CompilationEngine {
     }
 
 
+    /**
+     * A method that checks the var table for a given var name and checks if the vars type matches given type
+     * @param type represents the type we want to match to
+     * @param varName represents the var name
+     * @return A string that represents the vars value, may be null
+     * @throws VALUEException Exception for wrong value
+     */
     private String setVarValueFromVarTable(String type, String varName) throws VALUEException {
 
         // checking if the var is declared
         if (!this.varTable.varDeclared(varName)) { throw new VALUEException(ILLEGAL_VALUE);}
 
+        // todo add a function in the checker that checks for type match
         // if the var is a func param, no meaning to its value, need to check match types
         if (this.varTable.isAFuncParam(varName) & this.varTable.getVarType(type).equals(type)) {
             return null;
@@ -362,9 +436,14 @@ public class CompilationEngine {
         }
         // otherwise throws exception - wrong value
         throw new VALUEException(ILLEGAL_VALUE);
-        }
+    }
 
-        
+
+    /**
+     * A method that is in charge of compiling function declaration
+     * @param line represents the function declaration line
+     * @throws SYNTAXException Exception for wrong syntax
+     */
     private void compileFunctionDeclaration(String line) throws SYNTAXException {
 
         // checking if function declared inside another function
@@ -375,7 +454,7 @@ public class CompilationEngine {
         int firstSpaceLoc = line.indexOf(SPACE);
         this.currentFuncName = line.substring(firstSpaceLoc,roundOpenBraceLoc).trim();
 
-        enterMethodScope();
+        enterFunctionScope();
         this.varTable.newScope();
 
         // adding func params to the var table:
@@ -383,23 +462,61 @@ public class CompilationEngine {
 
     }
 
+
+    /**
+     * A checker if we are inside of if while scope
+     * @return true if we are inside, false otherwise
+     */
     private boolean inIfWhileScope() {return this.scopeDepthIfWhile > 0;}
 
+
+    /**
+     * Increases the scope counter
+     */
     private void increaseScopeDepthIfWhile() {this.scopeDepthIfWhile++;}
 
+
+    /**
+     * decreases the scope counter
+     */
     private void decreaseIfWhileScopeDepth() {this.scopeDepthIfWhile--;}
 
-    private boolean inMethodScope() {return this.inFuncFlag;}
 
-    private void enterMethodScope() {this.inFuncFlag = true;}
+    /**
+     * A checker if we are inside a method scope
+     * @return true if we are in a function scope, false otherwise
+     */
+    private boolean inFunctionScope() {return this.inFuncFlag;}
 
-    private void exitMethodScope() {this.inFuncFlag = false;}
 
+    /**
+     * sets the function flag to true
+     */
+    private void enterFunctionScope() {this.inFuncFlag = true;}
+
+
+    /**
+     * sets the function flag to false
+     */
+    private void exitFunctionScope() {this.inFuncFlag = false;}
+
+
+    /**
+     * Checker for exceeding the allowed scope depth - Integer.MAX_VALUE
+     * @return true if exceeded, false otherwise
+     */
     private boolean exceededMaxScopeDepth() {return this.scopeDepthIfWhile > Integer.MAX_VALUE;}
 
+
+    /**
+     * A method that in charge of compiling if while statement
+     * * @param line
+     * @throws SYNTAXException Exception for wrong syntax
+     * @throws SCOPEException Exception for exceeding the allowed scope depth - Integer.MAX_VALUE
+     */
     private void compileIfWhileStatement(String line) throws SYNTAXException, SCOPEException {
         // if / while out of function
-        if (!inMethodScope()) { throw new SYNTAXException(IF_WHILE_OUT_OF_METHOD); }
+        if (!inFunctionScope()) { throw new SYNTAXException(IF_WHILE_OUT_OF_METHOD); }
 
         // check if exceeded java.lang.Integer.MAX_VALUE:
         if (exceededMaxScopeDepth()) { throw new SCOPEException(IF_WHILE_EXCEEDING_DEPTH);}
@@ -414,7 +531,14 @@ public class CompilationEngine {
         }
     }
 
-    
+
+    /**
+     * A method that initializing the FuncTable by running on the file and compiling only function declaration
+     * lines
+     * @throws IOException Exception for using the BufferReader - can't read from the file
+     * @throws IDENTIFIERException Exception for wrong identifier (type, var name or func name)
+     * @throws SYNTAXException Exception for wrong syntax
+     */
     private void initiateFuncTable() throws IOException, IDENTIFIERException, SYNTAXException {
         String line;
 
@@ -432,7 +556,7 @@ public class CompilationEngine {
 
                 // dividing into 2 sections: func name, params
                 String funcName = line.substring(spaceLoc,braceStartLoc).trim();
-                String declaration = line.substring(braceStartLoc+1, braceFinishLoc);
+                String paramList = line.substring(braceStartLoc+1, braceFinishLoc);
 
                 // exception for the func name
                 if (!this.checker.legalMethodName(funcName)) {
@@ -441,9 +565,8 @@ public class CompilationEngine {
 
                 // creating the function object and dealing with its params list:
                 Function function = new Function(funcName, VOID);
-                funcDeclarationParamsListCheck(declaration, function);
+                funcDeclarationParamsListCheck(paramList, function);
 
-                // todo write test declaring 2 funcs with same name
                 if (!this.functionTable.addFunction(funcName, function)) {
                     throw new SYNTAXException(FUNC_ALREADY_DECLARED);
                 }
@@ -452,6 +575,13 @@ public class CompilationEngine {
     }
 
 
+    /**
+     * A helper function that deals with compiling the params list of compiling function line
+     * @param declaration represents the param list part of the declaration
+     * @param func represents the function object
+     * @throws IDENTIFIERException Exception for wrong identifier (type, var name or func name)
+     * @throws SYNTAXException Exception for wrong syntax
+     */
     private void funcDeclarationParamsListCheck(String declaration, Function func) throws IDENTIFIERException,
             SYNTAXException {
         // todo general check for the line correctness!!
@@ -476,7 +606,6 @@ public class CompilationEngine {
             // throwing exceptions for var name
             if (!this.checker.isLegalVarName(name)) { throw new IDENTIFIERException(ILLEGAL_VAR_NAME); }
 
-            //todo write a test for function param list: 2 vars with same name
             if (!func.addArgument(name, type, finalOrNot)) {throw new SYNTAXException(VAR_ALREADY_DECLARED);}
         }
     }

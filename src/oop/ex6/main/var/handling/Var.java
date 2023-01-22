@@ -47,7 +47,15 @@ public class Var {
      */
     public void setValue(String value) { this.value = value;}
 
+    /**
+     * A setter to the value of isAfFuncParam field
+     * @param afFuncParam value to set
+     */
     public void setAFuncParam(boolean afFuncParam) { this.isAfFuncParam = afFuncParam;}
 
+    /**
+     * A getter to the value of isAfFuncParam field
+     * @return the value of the field
+     */
     public boolean isAFuncParam() {return this.isAfFuncParam;}
 }

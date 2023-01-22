@@ -169,9 +169,10 @@ public class VarTable {
     }
 
     /**
+     * A getter for the information if the var was initialed by func param
      * The var should be inside the func!!!!
-     * @param name
-     * @return
+     * @param name represents the vars name
+     * @return true if is, false otherwise
      */
     public boolean isAFuncParam(String name) {
         // checking the table in reversed order
@@ -184,13 +185,27 @@ public class VarTable {
         return false;
     }
 
-    public void setAFuncParam(String name, boolean valueToChange) {
+    /**
+     * A setter for the information if the var was initialed by func param
+     * the function checks if it is legal to set the new value (if the var is not final)
+     * @param name represents the vars name
+     * @param valueToChange represents the value to set
+     * @return true if succeeded, false otherwise
+     */
+    public boolean setAFuncParam(String name, boolean valueToChange) {
         // checking the table in reversed order
         Iterator<HashMap<String, Var>> iterator = this.vars.descendingIterator();
         while( iterator.hasNext()) {
             for (Map.Entry<String, Var> entry: iterator.next().entrySet()){
-                if (entry.getKey().equals(name)) { entry.getValue().setAFuncParam(valueToChange);}
+                if (entry.getKey().equals(name)) {
+
+                    if (entry.getValue().finalOrNot()) { return false;}
+
+                    entry.getValue().setAFuncParam(valueToChange);
+                    return true;
+                }
             }
         }
+        return false;
     }
 }
