@@ -1,4 +1,4 @@
-package oop.ex6.main.var.handling;
+package oop.ex6.main.var_handling;
 
 public class Var {
 

@@ -1,7 +1,9 @@
 package oop.ex6.main;
 
-import oop.ex6.main.function.handling.FunctionTable;
-import oop.ex6.main.var.handling.VarTable;
+import oop.ex6.main.compiler.CompilationEngine;
+import oop.ex6.main.function_handling.FunctionTable;
+import oop.ex6.main.validity_checker.CorrectnessChecker;
+import oop.ex6.main.var_handling.VarTable;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

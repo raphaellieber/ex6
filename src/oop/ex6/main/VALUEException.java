@@ -37,5 +37,4 @@ public class VALUEException extends Exception{
     public VALUEException(String message, Throwable cause) {
         super(message, cause);
     }
-
 }

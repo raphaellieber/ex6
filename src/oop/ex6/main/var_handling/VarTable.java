@@ -1,16 +1,16 @@
-package oop.ex6.main.var.handling;
+package oop.ex6.main.var_handling;
 
 import java.util.*;
 
 public class VarTable {
 
     private final LinkedList<HashMap<String, Var>> vars;
+    private final HashMap<String, Var> globalVarsFirstState;
 
     private int scopeInd;
 
     public VarTable(){
-//        this.globalVars = new HashMap<>();
-
+        this.globalVarsFirstState = new HashMap<>();
         this.vars = new LinkedList<>();
 
         // initializing hashmap for first scope - global scope
@@ -26,17 +26,22 @@ public class VarTable {
      * @param value String that represents vars value, may be null
      * @return true upon success, false otherwise
      */
-    public boolean addVar(String name, boolean finalOrNot, String type, String value,
-                          boolean functionalParam){
+    public boolean addVar(String name, boolean finalOrNot, String type, String value,boolean funcParam){
 
         // check if the var is already in the table at the same scope:
         if (varDeclaredInCurScope(name)) { return false;}
 
         // creating the var according to the given params
-        Var var = new Var(finalOrNot, type, value, functionalParam);
+        Var var = new Var(finalOrNot, type, value, funcParam);
 
         // inserting into the vars table at the last scope
         this.vars.getLast().put(name, var);
+
+        // keeping the first state of the global vars
+        if(this.scopeInd == 0) {
+            Var newVar = new Var(finalOrNot, type, value, funcParam);
+            this.globalVarsFirstState.put(name, newVar);
+        }
 
         return true;
     }
@@ -210,5 +215,17 @@ public class VarTable {
             }
         }
         return false;
+    }
+
+    public void retrieveGlobalVarsFirstState(){
+
+        for (Map.Entry<String, Var> entry:  this.globalVarsFirstState.entrySet()){
+            String varName = entry.getKey();
+            Var varToSet = entry.getValue();
+            Var newVar = new Var(varToSet.finalOrNot(), varToSet.getType(),
+                                 varToSet.getValue(),varToSet.isAFuncParam());
+
+            this.vars.getFirst().replace(varName, newVar);
+        }
     }
 }

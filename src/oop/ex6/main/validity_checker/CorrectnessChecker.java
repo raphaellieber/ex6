@@ -1,5 +1,6 @@
-package oop.ex6.main;
+package oop.ex6.main.validity_checker;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CorrectnessChecker {
@@ -13,10 +14,11 @@ public class CorrectnessChecker {
 
     // if/while regex
     private static final String GENERIC_IF_WHILE_PATTERN = "^\\s*(if|while)\\s*\\(.*\\)\\s*\\{";
-    private static final String GENERIC_CONDITION_PATTERN = "\\(\\s*\\w+\\s*(((\\|\\|)|(&&))\\s*\\w+\\s*)*\\)";
+//    private static final String GENERIC_CONDITION_PATTERN = "\\s*\\w+\\s*(((\\|\\|)|(&&))\\s*\\w+\\s*)*";
+    private static final String GENERIC_CONDITION_PATTERN = ".+((\\|\\|)?|(&&))*";
     private static final String TRUE_FALSE_PATTERN = "\\s*true|false\\s*";
     private static final String INITIALIZED_VAR_PATTERN = "\\s*\\w+\\s*";
-    private static final String VALUE_PATTERN = "\\s*[+-]?((\\d+.?\\d*)|(\\d*.?\\d+))\\s*";
+//    private static final String VALUE_PATTERN = "\\s*[+-]?((\\d+.?\\d*)|(\\d*.?\\d+))\\s*";
 
     // values regex
     private static final String INT_VALUE = "^[-+]?\\d+";
@@ -39,8 +41,25 @@ public class CorrectnessChecker {
     private static final String BOOLEAN = "boolean";
     private static final String STRING = "String";
     private static final String CHAR = "char";
-//    private static final String VOID = "void";
+    private static final String VOID = "void";
+    private static final String WHILE = "while";
+    private static final String IF = "if";
+    private static final String FINAL = "final";
 
+
+    private static final ArrayList<String> DECLARATION_KEYWORDS = new ArrayList<>() {
+        {
+            add(INT);
+            add(DOUBLE);
+            add(BOOLEAN);
+            add(STRING);
+            add(CHAR);
+            add(FINAL);
+            add (VOID);
+            add(WHILE);
+            add(IF);
+        }
+    };
 
     /**
      * A method that verifies whether the argument corresponds to a legal variable name (i.e. starting with letters
@@ -48,7 +67,10 @@ public class CorrectnessChecker {
      * @param name the variable name to verify.
      * @return ture if correct, false otherwise.
      */
-    public boolean isLegalVarName(String name) {return name.matches(VAR_NAME); }
+    public boolean isLegalVarName(String name) {
+        if (DECLARATION_KEYWORDS.contains(name)) {return false;}
+        return name.matches(VAR_NAME);
+    }
 
     /**
      * A function that checks the value correctness depends on a type
@@ -94,7 +116,10 @@ public class CorrectnessChecker {
      * @param name the method name to verify.
      * @return true if correct, false otherwise.
      */
-    public boolean legalMethodName(String name) {return name.matches(METHOD_NAME);}
+    public boolean legalMethodName(String name) {
+        if (DECLARATION_KEYWORDS.contains(name)) {return false;}
+        return name.matches(METHOD_NAME);
+    }
 
 //    /**
 //     * A method that verifies whether the method returns a legal type.
@@ -148,7 +173,7 @@ public class CorrectnessChecker {
 
     public boolean hasLegalConditionPattern(String condition) {return condition.matches(GENERIC_CONDITION_PATTERN);}
 
-    public boolean hasValueCondition(String condition) {return condition.matches(VALUE_PATTERN);}
+    public boolean hasValueCondition(String condition) {return condition.matches(DOUBLE_VALUE);}
 
     public boolean hasTrueFalseCondition(String condition) {return condition.matches(TRUE_FALSE_PATTERN);}
 

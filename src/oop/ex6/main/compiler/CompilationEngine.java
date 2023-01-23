@@ -1,8 +1,10 @@
-package oop.ex6.main;
+package oop.ex6.main.compiler;
 
-import oop.ex6.main.function.handling.Function;
-import oop.ex6.main.function.handling.FunctionTable;
-import oop.ex6.main.var.handling.VarTable;
+import oop.ex6.main.*;
+import oop.ex6.main.function_handling.Function;
+import oop.ex6.main.function_handling.FunctionTable;
+import oop.ex6.main.validity_checker.CorrectnessChecker;
+import oop.ex6.main.var_handling.VarTable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -57,10 +59,10 @@ public class CompilationEngine {
     private static final String ILLEGAL_IF_WHILE = "If/While declared out of function";
     //    private static final String ASSIGNING_FINAL_VAR = "Illegal assignment of final var";
     private static final String ILLEGAL_FUNCTION_CALL = "Illegal function call";
-    private static final String ILLEGAL_NUM_OF_PARAMS = "Given illegal number of params";
+    private static final String PARAMS_DO_NOT_MATCH = "Given illegal number of params or types doesn't match";
     private static final String ILLEGAL_ASSIGNMENT = "Illegal assignment of var, may be final or undeclared";
-    private static final String UNDECLARED_PARAM = "Used undeclared param";
-    private static final String VAR_ALREADY_DECLARED = "Var with same name was declared in this scope";
+    private static final String PARAM_NOT_FOUND = "Used undeclared param or illegal value";
+    private static final String VAR_ALREADY_DECLARED = "Var with same name was already declared";
     private static final String FUNC_ALREADY_DECLARED = "Function with same name was declared in this scope";
     private static final String ILLEGAL_LINE = "Illegal line";
     private static final String EXTRA_PARENTHESES = "Too much parentheses";
@@ -171,7 +173,6 @@ public class CompilationEngine {
         }
     }
 
-    // todo check if the given param is the actual value
 
     /**
      * A method that charge of compiling a function call
@@ -192,7 +193,8 @@ public class CompilationEngine {
 
         String funcName = line.substring(0, openRoundBraces).trim();
         String paramsList = line.substring(openRoundBraces + 1, closeRoundBraces);
-        String[] splitParam = paramsList.split(ALL_SPACES_REGEX);
+        paramsList = paramsList.replaceAll(ALL_SPACES_REGEX, "");
+        String[] splitParam = paramsList.split(COMMA);
 
         // checking the name
         if (!this.functionTable.isFuncDeclared(funcName)) { throw new IDENTIFIERException(ILLEGAL_FUNC_NAME);}
@@ -203,9 +205,8 @@ public class CompilationEngine {
 
         // checking if number of types is sufficient and the types matches to the function params list
         if (!this.checker.checkEqualTypesAll(receiverTypeList, assignersTypeList)){
-            throw new SYNTAXException(ILLEGAL_NUM_OF_PARAMS);
+            throw new SYNTAXException(PARAMS_DO_NOT_MATCH);
         }
-
     }
 
 
@@ -221,24 +222,39 @@ public class CompilationEngine {
 
         List<String> paramsTypeList = new ArrayList<>();
         for (String name: splitParam){
-            String type;
+            if (name.length() > 0){
+                // checking if the name is an actual value:
+                String type = checkForMatchingValue(name);
 
-            // looking first in function params list
-            if (this.functionTable.isAFuncVar(funcName,name)) {
-                type = this.functionTable.getFuncVarsType(funcName,name);
+                if (type == null){
+                    // looking first in current function params list
+                    if (this.functionTable.isAFuncVar(this.currentFuncName,name)) {
+                        type = this.functionTable.getFuncVarsType(funcName,name);
+                    }
+
+                    // looking in the var table and checking if the param has value
+                    else { if (this.varTable.varDeclared(name) & this.varTable.getVarValue(name) != null) {
+                        type = this.varTable.getVarType(name);
+                    }
+                    // param not found
+                    else { throw new SYNTAXException(PARAM_NOT_FOUND); }}
+                }
+                paramsTypeList.add(type);
             }
-
-            // looking in the var table and checking if the param has value
-            else { if (this.varTable.varDeclared(name) & this.varTable.getVarValue(name) != null) {
-                type = this.varTable.getVarType(name);
-            }
-
-            // param not found
-            else { throw new SYNTAXException(UNDECLARED_PARAM); }}
-
-            paramsTypeList.add(type);
         }
         return paramsTypeList;
+    }
+
+
+    private String checkForMatchingValue(String name) {
+        String type = null;
+
+        if (this.checker.isLegalValue(INT, name)) { type = INT;}
+        else {if (this.checker.isLegalValue(DOUBLE, name)) { type = DOUBLE;}
+        else {if (this.checker.isLegalValue(BOOLEAN, name)) { type = BOOLEAN;}
+        else {if (this.checker.isLegalValue(CHAR, name)) { type = CHAR;}
+        else {if (this.checker.isLegalValue(STRING, name)) { type = STRING;}}}}}
+        return type;
     }
 
 
@@ -268,15 +284,19 @@ public class CompilationEngine {
 
             // checking if the vars value is legal, if not, the "value" may be another var
             String type = this.varTable.getVarType(varName);
-            if (!this.checker.isLegalValue(type, value)) { value = setVarValueFromVarTable(type,value);}
+            if (!this.checker.isLegalValue(type, value)) {
+                value = setVarValueFromVarTable(type,value);
+            }
+
+            // if var is from outer scope, we will add it into the current
 
             // setting the value of the var -> checks as well if the var declared and is not final
             if (!this.varTable.setValue(varName, value)){ throw new SYNTAXException(ILLEGAL_ASSIGNMENT); }
 
             // if the value is null and reached here means that it was assigned by legal value by funcParam
-            if (value == null & !this.varTable.setAFuncParam(varName, true)) {
+            else {if (value == null & !this.varTable.setAFuncParam(varName, true)) {
                 throw new SYNTAXException(ILLEGAL_ASSIGNMENT);
-            }
+            }}
 
 //            // checking if the var declared
 //            if (!this.varTable.varDeclared(varName)) { throw new IDENTIFIERException(UNDECLARED_PARAM);}
@@ -313,6 +333,7 @@ public class CompilationEngine {
         else if(inFunctionScope()) {
             exitFunctionScope();
             this.currentFuncName = null;
+            this.varTable.retrieveGlobalVarsFirstState();
         }
     }
 
@@ -373,27 +394,31 @@ public class CompilationEngine {
         if (split.length < 1) { throw new SYNTAXException(NO_VAR_NAME); }
 
         for (String str : split) {
-            boolean funcParam = false;
-            String value = null;
-            String name = str;
+            if (str.length() > 0){
+                boolean funcParam = false;
+                String value = null;
+                String name = str;
 
-            // if there is an assignment inside the declaration
-            if (name.contains(EQUAL)) {
-                name = str.split(EQUAL)[0];
-                value = str.split(EQUAL)[1];
+                // if there is an assignment inside the declaration
+                if (name.contains(EQUAL)) {
+                    name = str.split(EQUAL)[0];
+                    value = str.split(EQUAL)[1];
 
-                // if the value isn't valid, means it's another var, looking in the varTable
-                if (!this.checker.isLegalValue(type, value)) { value = setVarValueFromVarTable(type, value); }
+                    // if the value isn't valid, means it's another var, looking in the varTable
+                    if (!this.checker.isLegalValue(type, value)) {
+                        value = setVarValueFromVarTable(type, value);
+                    }
 
-                // checking if a func param
-                funcParam = this.varTable.isAFuncParam(name);
-            }
+                    // checking if a func param
+                    funcParam = this.varTable.isAFuncParam(name);
+                }
 
-            // checks var validity
-            checkVarValidityHelper(finalOrNot, funcParam, value, name);
+                // checks var validity
+                checkVarValidityHelper(finalOrNot, funcParam, value, name);
 
-            if (!this.varTable.addVar(name, finalOrNot, type, value, funcParam)) {
-                throw new SYNTAXException(VAR_ALREADY_DECLARED);
+                if (!this.varTable.addVar(name, finalOrNot, type, value, funcParam)) {
+                    throw new SYNTAXException(VAR_ALREADY_DECLARED);
+                }
             }
 
         }
@@ -436,7 +461,7 @@ public class CompilationEngine {
 
         // if the var is a func param, no meaning to its value, need to check match types
         if (this.varTable.isAFuncParam(varName) &
-                this.checker.checkEqualTypes(type, this.varTable.getVarType(type))) { return null; }
+                this.checker.checkEqualTypes(type, this.varTable.getVarType(varName))) { return null; }
 
         // if vars value isn't null
         if ( this.varTable.getVarValue(varName) != null) {
@@ -521,22 +546,32 @@ public class CompilationEngine {
 
     private boolean hasValidIfWhileCondition(String condition) {
         String[] conditions = condition.split(CONDITION_DELIMITER);
+
         for (String singleCondition : conditions) {
-            if (!isValidSingleCondition(singleCondition))
+            singleCondition = singleCondition.replaceAll(ALL_SPACES_REGEX, "");
+
+            if (!isValidSingleCondition(singleCondition.trim()))
                 return false;
         }
         return true;
     }
 
     private boolean isValidSingleCondition(String singleCondition) {
-        return this.checker.hasTrueFalseCondition(singleCondition) || this.checker.hasValueCondition(singleCondition)
-                || legalIfWhileInitializedVarCondition(singleCondition);
-    }
 
-    private boolean legalIfWhileInitializedVarCondition(String condition) {
-        return this.checker.hasInitializedVarCondition(condition) && varTable.varDeclared(condition) && (
-                varTable.getVarType(condition).equals(BOOLEAN) | varTable.getVarType(condition).equals(DOUBLE) ||
-                        varTable.getVarType(condition).equals(INT));
+        // true false condition
+        if (this.checker.hasTrueFalseCondition(singleCondition)) {return true;}
+
+        // value condition
+        if (this.checker.hasValueCondition(singleCondition) ) { return true;}
+
+        // var condition
+        if (this.varTable.varDeclared(singleCondition)){
+            return  this.varTable.getVarType(singleCondition).equals(BOOLEAN) |
+                    this.varTable.getVarType(singleCondition).equals(DOUBLE) |
+                    this.varTable.getVarType(singleCondition).equals(INT);
+        }
+        return false;
+
     }
 
 
@@ -557,20 +592,16 @@ public class CompilationEngine {
         if (!this.checker.hasLegalIfWhilePattern(line)) {throw new SYNTAXException(ILLEGAL_IF_WHILE_DEC);}
 
         // condition check
-        if(this.checker.hasLegalConditionPattern(line)) {
-            int openingBracketIndex = line.indexOf("(");
-            int closingBracketIndex = line.lastIndexOf(")");
-            String condition = line.substring(openingBracketIndex, closingBracketIndex + 1).trim();
-            if (checker.hasLegalConditionPattern(condition))
-                if (this.hasValidIfWhileCondition(condition)) {
-                    increaseScopeDepthIfWhile();
-                    this.varTable.newScope();
-                }
+        int openingBracketIndex = line.indexOf("(");
+        int closingBracketIndex = line.lastIndexOf(")");
+        String condition = line.substring(openingBracketIndex+1, closingBracketIndex).trim();
+
+        if (checker.hasLegalConditionPattern(condition) & this.hasValidIfWhileCondition(condition)) {
+                increaseScopeDepthIfWhile();
+                this.varTable.newScope();
+                return;
         }
-        else {throw new SYNTAXException(ILLEGAL_CONDITION); }
-
-
-        //TODO: add possibility to have multiple conditions using || and &&
+        throw new SYNTAXException(ILLEGAL_CONDITION);
     }
 
 
