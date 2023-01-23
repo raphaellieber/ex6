@@ -25,23 +25,24 @@ public class CompilationEngine {
     private static final String WHILE = "while";
     private static final String IF = "if";
 
+    // symbols
     private static final String ROUND_OPEN_BRACE = "(";
     private static final String ROUND_CLOSE_BRACE = ")";
-    //    private static final String CURLY_OPEN_BRACE = "{";
-    //    private static final String CURLY_CLOSE_BRACE = "}";
+    private static final String CURLY_OPEN_BRACE = "{";
+    private static final String CURLY_CLOSE_BRACE = "}";
     private static final String SPACE = " ";
     private static final String SEMICOLON = ";";
     private static final String COMMA = ",";
     private static final String EQUAL = "=";
+
+    // regex or other helper expressions
     private static final String FUNC_PARAM_LST_SPLIT_REGEX = "\\s*,\\s*";
     private static final String ALL_SPACES_REGEX = "\\s";
-
     private static final String FUNC_DECLARATION_START = "void ";
     private static final String RETURN_REGEX = "^\\s*return\\s*;\\s*$";
     private static final String END_OF_SCOPE_REGEX = "^\\s*}\\s*$";
     private static final String ASSIGNMENT_REGEX = "^.*=.*";
     private static final String FUNCTION_CALL_REGEX = "^.*\\(.*\\).*";
-
     private static final String CONDITION_DELIMITER = "(\\|\\|)|(&&)";
 
     // Exceptions messages:
@@ -54,10 +55,8 @@ public class CompilationEngine {
     private static final String ILLEGAL_DECLARATION_LINE = "Illegal declaration line";
     private static final String ILLEGAL_FUNCTION_DECLARATION = "Illegal in function - function declaration";
     private static final String ILLEGAL_FUNC_DEC_LINE = "Illegal function declaration";
-//    private static final String IF_WHILE_OUT_OF_METHOD = "If/While declared out of method";
     private static final String IF_WHILE_EXCEEDING_DEPTH = "If/While statement exceeding max depth";
     private static final String ILLEGAL_IF_WHILE = "If/While declared out of function";
-    //    private static final String ASSIGNING_FINAL_VAR = "Illegal assignment of final var";
     private static final String ILLEGAL_FUNCTION_CALL = "Illegal function call";
     private static final String PARAMS_DO_NOT_MATCH = "Given illegal number of params or types doesn't match";
     private static final String ILLEGAL_ASSIGNMENT = "Illegal assignment of var, may be final or undeclared";
@@ -68,7 +67,6 @@ public class CompilationEngine {
     private static final String EXTRA_PARENTHESES = "Too much parentheses";
     private static final String ILLEGAL_IF_WHILE_DEC = "Illegal if/ while declaration";
     private static final String ILLEGAL_CONDITION = "Illegal condition";
-
 
 
     private static final ArrayList<String> DECLARATION_KEYWORDS = new ArrayList<>() {
@@ -93,9 +91,21 @@ public class CompilationEngine {
     private long scopeDepthIfWhile;
     private String currentFuncName;
 
+    /**
+     * Constructor
+     * @param checker represents a CorrectnessChecker class object
+     * @param functionTable represents a FunctionTable class object
+     * @param varTable represents a varTable class object
+     * @param reader represents a buffered stream to read from
+     * @param firstRunReader represents a buffered stream to read from
+     * @throws IOException Exception for using the BufferReader - can't read from the file
+     * @throws SYNTAXException Exception for wrong syntax
+     * @throws VALUEException Exception for wrong value
+     * @throws IDENTIFIERException Exception for wrong identifier (type, var name or func name)
+     */
     public CompilationEngine (CorrectnessChecker checker, FunctionTable functionTable,
                               VarTable varTable,  BufferedReader reader, BufferedReader firstRunReader)
-            throws IDENTIFIERException, IOException, SYNTAXException {
+            throws IDENTIFIERException, IOException, SYNTAXException, VALUEException {
         this.checker = checker;
         this.varTable = varTable;
         this.functionTable = functionTable;
@@ -105,8 +115,8 @@ public class CompilationEngine {
         this.scopeDepthIfWhile = 0L;
         this.currentFuncName = null;
 
-        // Initializing the function table:
-        initiateFuncTable();
+        // Initializing the function table and global vars:
+        firstRun();
 
     }
 
@@ -146,7 +156,9 @@ public class CompilationEngine {
             if (firstSpace != -1) { firstWord = line.substring(0, firstSpace);}
 
             // compiling declaration line
-            if (DECLARATION_KEYWORDS.contains(firstWord)) { compileVarDeclaration(line); }
+            if (DECLARATION_KEYWORDS.contains(firstWord)) {
+                if (!varTable.inGlobalScope()){compileVarDeclaration(line); }
+            }
 
             // compiling declaration of a function
             else {if (firstWord.equals(VOID)) { compileFunctionDeclaration(line); }
@@ -161,7 +173,10 @@ public class CompilationEngine {
             else { if (line.matches(RETURN_REGEX)) { compileReturnStatement(); }
 
             // assignment line (not as declaration)
-            else {if (line.matches(ASSIGNMENT_REGEX)) { compileVarAssignment(line); }
+
+            else {if (line.matches(ASSIGNMENT_REGEX)) {
+                if (!varTable.inGlobalScope()) {compileVarAssignment(line); }
+            }
 
             // function call
             else {if (line.matches(FUNCTION_CALL_REGEX)) {compileFunctionCall(line);}
@@ -169,7 +184,6 @@ public class CompilationEngine {
             else {throw new SYNTAXException(ILLEGAL_LINE);}
 
             }}}}}}
-
         }
     }
 
@@ -287,9 +301,6 @@ public class CompilationEngine {
             if (!this.checker.isLegalValue(type, value)) {
                 value = setVarValueFromVarTable(type,value);
             }
-
-            // if var is from outer scope, we will add it into the current
-
             // setting the value of the var -> checks as well if the var declared and is not final
             if (!this.varTable.setValue(varName, value)){ throw new SYNTAXException(ILLEGAL_ASSIGNMENT); }
 
@@ -297,23 +308,6 @@ public class CompilationEngine {
             else {if (value == null & !this.varTable.setAFuncParam(varName, true)) {
                 throw new SYNTAXException(ILLEGAL_ASSIGNMENT);
             }}
-
-//            // checking if the var declared
-//            if (!this.varTable.varDeclared(varName)) { throw new IDENTIFIERException(UNDECLARED_PARAM);}
-//
-//            // checking if trying to assign final var
-//            boolean finalOrNot = this.varTable.getVarFinalOrNot(varName);
-//            if (finalOrNot) {throw new IDENTIFIERException(ASSIGNING_FINAL_VAR); }
-
-
-//            // if value isn't null it's a legal value, given in the beginning or from setVarValueFromVarTable
-//            if (value != null) { this.varTable.setValue(varName, value); }
-
-//            // the value is irrelevant from now on because was assigned by legal value by funcParam
-//            else {
-//                this.varTable.setValue(varName, value);
-//                this.varTable.setAFuncParam(varName, true);
-//            }
         }
     }
 
@@ -324,7 +318,6 @@ public class CompilationEngine {
     private void compileEndOfScope() throws SYNTAXException {
 
         if (!this.varTable.outOfScope()) {throw new SYNTAXException(EXTRA_PARENTHESES);}
-
 
         // out of if/while scope
         if (inIfWhileScope()) { decreaseIfWhileScopeDepth();}
@@ -544,6 +537,12 @@ public class CompilationEngine {
      */
     private boolean exceededMaxScopeDepth() {return this.scopeDepthIfWhile > Integer.MAX_VALUE;}
 
+
+    /**
+     * A checker if a condition is a valid if/while condition
+     * @param condition represents the condition
+     * @return true if is, false otherwise
+     */
     private boolean hasValidIfWhileCondition(String condition) {
         String[] conditions = condition.split(CONDITION_DELIMITER);
 
@@ -556,6 +555,12 @@ public class CompilationEngine {
         return true;
     }
 
+
+    /**
+     * a helper for hasValidIfWhileCondition method, this method checks if each single condition is legal
+     * @param singleCondition represents a single condition
+     * @return true if is, false otherwise
+     */
     private boolean isValidSingleCondition(String singleCondition) {
 
         // true false condition
@@ -612,39 +617,70 @@ public class CompilationEngine {
      * @throws IDENTIFIERException Exception for wrong identifier (type, var name or func name)
      * @throws SYNTAXException Exception for wrong syntax
      */
-    private void initiateFuncTable() throws IOException, IDENTIFIERException, SYNTAXException {
+    private void firstRun() throws IOException, IDENTIFIERException, SYNTAXException,
+            VALUEException {
         String line;
-
         while ((line = this.firstRunReader.readLine()) != null) {
-            if (line.startsWith(FUNC_DECLARATION_START)){
 
-                int braceStartLoc = line.indexOf(ROUND_OPEN_BRACE);
-                int braceFinishLoc = line.indexOf(ROUND_CLOSE_BRACE);
-                int spaceLoc = line.indexOf(SPACE);
+            int firstSpace = line.indexOf(SPACE);
+            String firstWord = "";
+            if (firstSpace != -1) { firstWord = line.substring(0, firstSpace);}
 
-                // checking validity of the given line: '(', ')' and {
-                if (!this.checker.legalFunctionDeclarationLine(line)) {
-                    throw new SYNTAXException(ILLEGAL_FUNC_DEC_LINE);
-                }
-
-                // dividing into 2 sections: func name, params
-                String funcName = line.substring(spaceLoc,braceStartLoc).trim();
-                String paramList = line.substring(braceStartLoc+1, braceFinishLoc);
-
-                // exception for the func name
-                if (!this.checker.legalMethodName(funcName)) {
-                    throw new IDENTIFIERException(ILLEGAL_FUNC_NAME);
-                }
-
-                // creating the function object and dealing with its params list:
-                Function function = new Function(funcName, VOID);
-
-                if (paramList.length() > 0) { funcDeclarationParamsListCheck(paramList, function); }
-
-                if (!this.functionTable.addFunction(funcName, function)) {
-                    throw new SYNTAXException(FUNC_ALREADY_DECLARED);
-                }
+            // compiling declaration line only if in global scope
+            if (DECLARATION_KEYWORDS.contains(firstWord) && this.varTable.inGlobalScope()) {
+                compileVarDeclaration(line);
             }
+
+            // assignment line (not as declaration)
+            else {if (line.matches(ASSIGNMENT_REGEX) && this.varTable.inGlobalScope()) {
+                compileVarAssignment(line);
+            }
+
+            // compiling func declaration line
+            else {if (line.startsWith(FUNC_DECLARATION_START)){
+                compileFuncDecHelper(line);
+            }}}
+
+            if (line.contains(CURLY_OPEN_BRACE)) { this.varTable.newScope();}
+            if (line.contains(CURLY_CLOSE_BRACE)) {
+                if (!this.varTable.outOfScope()) { throw new SYNTAXException(EXTRA_PARENTHESES); }
+            }
+        }
+    }
+
+
+    /**
+     * Helper function to compile function declaration line
+     * @param line represents the function declaration line
+     * @throws IDENTIFIERException Exception for wrong identifier (type, var name or func name)
+     * @throws SYNTAXException Exception for wrong syntax
+     */
+    private void compileFuncDecHelper(String line) throws SYNTAXException, IDENTIFIERException {
+        int braceStartLoc = line.indexOf(ROUND_OPEN_BRACE);
+        int braceFinishLoc = line.indexOf(ROUND_CLOSE_BRACE);
+        int spaceLoc = line.indexOf(SPACE);
+
+        // checking validity of the given line: '(', ')' and {
+        if (!this.checker.legalFunctionDeclarationLine(line)) {
+            throw new SYNTAXException(ILLEGAL_FUNC_DEC_LINE);
+        }
+
+        // dividing into 2 sections: func name, params
+        String funcName = line.substring(spaceLoc,braceStartLoc).trim();
+        String paramList = line.substring(braceStartLoc+1, braceFinishLoc);
+
+        // exception for the func name
+        if (!this.checker.legalMethodName(funcName)) {
+            throw new IDENTIFIERException(ILLEGAL_FUNC_NAME);
+        }
+
+        // creating the function object and dealing with its params list:
+        Function function = new Function(funcName, VOID);
+
+        if (paramList.length() > 0) { funcDeclarationParamsListCheck(paramList, function); }
+
+        if (!this.functionTable.addFunction(funcName, function)) {
+            throw new SYNTAXException(FUNC_ALREADY_DECLARED);
         }
     }
 
@@ -658,7 +694,7 @@ public class CompilationEngine {
      */
     private void funcDeclarationParamsListCheck(String declaration, Function func) throws IDENTIFIERException,
             SYNTAXException {
-        // todo general check for the line correctness!!
+
         // the result will be: type name or final type name
         String[] pramTypeTmp = declaration.split(FUNC_PARAM_LST_SPLIT_REGEX);
 

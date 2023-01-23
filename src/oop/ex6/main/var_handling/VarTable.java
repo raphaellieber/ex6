@@ -65,24 +65,6 @@ public class VarTable {
      * @param name a String that represents the vars name
      * @return returns the wanted info of the var from the table
      */
-    public Boolean getVarFinalOrNot (String name) {
-
-        // checking the table in reversed order
-        Iterator<HashMap<String, Var>> iterator = this.vars.descendingIterator();
-        while( iterator.hasNext()) {
-            for (Map.Entry<String, Var> entry: iterator.next().entrySet()){
-                if (entry.getKey().equals(name)) { return entry.getValue().finalOrNot();}
-            }
-        }
-        return null;
-    }
-
-    /**
-     * A method that returns the wanted info about the var
-     * !!!! method assumes the var is in the table !!!!
-     * @param name a String that represents the vars name
-     * @return returns the wanted info of the var from the table
-     */
     public String getVarType (String name) {
 
         // checking the table in reversed order
@@ -217,6 +199,9 @@ public class VarTable {
         return false;
     }
 
+    /**
+     * A method that retrieves the global scopes var to its original state before entered any function
+     */
     public void retrieveGlobalVarsFirstState(){
 
         for (Map.Entry<String, Var> entry:  this.globalVarsFirstState.entrySet()){
@@ -228,4 +213,10 @@ public class VarTable {
             this.vars.getFirst().replace(varName, newVar);
         }
     }
+
+    /**
+     * A checker if we are in the global scope or not
+     * @return true if is, false otherwise
+     */
+    public boolean inGlobalScope() { return this.scopeInd == 0; }
 }

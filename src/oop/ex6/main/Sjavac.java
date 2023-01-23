@@ -14,6 +14,9 @@ public class Sjavac {
     static final int FAILURE = 1;
     static final int IO_ERROR = 2;
 
+    static final String FILE_NOT_FOUND = "File was not found or can't be open";
+    static final String NO_PATH = "No file path given";
+
     public static int compileFile(String filePath) {
         try (  FileReader fileReader = new FileReader(filePath);
                FileReader firstRunFileReader = new FileReader(filePath);
@@ -31,7 +34,7 @@ public class Sjavac {
         }
 
         catch (IOException e) {
-            System.err.println("File was not found or can't be open");
+            System.err.println(FILE_NOT_FOUND);
             return IO_ERROR;
         }
 
@@ -45,7 +48,7 @@ public class Sjavac {
     public static void main(String[] args) {
 
         if (args.length == 0) {
-            System.err.println("No file path given");
+            System.err.println(NO_PATH);
             System.out.println(IO_ERROR);;
         }
 

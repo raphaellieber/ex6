@@ -4,19 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="27397662-d302-41b9-8131-0f0e485311c3" name="Changes" comment="another update">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_22_01_2023_12_37__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_22_01_2023_12_37__Changes_.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_23_01_2023_0_04__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_23_01_2023_0_04__Changes_.xml" afterDir="false" />
+    <list default="true" id="27397662-d302-41b9-8131-0f0e485311c3" name="Changes" comment="Almost done2!">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/CompilationEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/compiler/CompilationEngine.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/CorrectnessChecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/validity_checker/CorrectnessChecker.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/MethodChecker.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/Sjavac.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/Sjavac.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/VALUEException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/VALUEException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/function/handling/Function.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/function/handling/FunctionTable.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/var/handling/Var.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/var_handling/Var.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/var/handling/VarTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/var_handling/VarTable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/compiler/CompilationEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/compiler/CompilationEngine.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/function_handling/Function.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/function_handling/Function.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/function_handling/FunctionTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/function_handling/FunctionTable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/validity_checker/CorrectnessChecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/validity_checker/CorrectnessChecker.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/oop/ex6/main/var_handling/VarTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/oop/ex6/main/var_handling/VarTable.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,11 +65,16 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
+  <component name="RunAnythingCache">
+    <option name="myCommands">
+      <command value=" " />
+    </option>
+  </component>
   <component name="RunManager">
     <configuration name="Sjavac" type="Application" factoryName="Application" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="oop.ex6.main.Sjavac" />
       <module name="ex6" />
-      <option name="PROGRAM_PARAMETERS" value="ourtests\test19.sjava" />
+      <option name="PROGRAM_PARAMETERS" value="ourtests\test20.sjava" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -175,7 +175,21 @@
       <option name="project" value="LOCAL‎" />
       <updated>1674429037797</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL‎-00013" summary="Almost done!">
+      <created>1674479729384</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL‎-00013" />
+      <option name="project" value="LOCAL‎" />
+      <updated>1674479729384</updated>
+    </task>
+    <task id="LOCAL‎-00014" summary="Almost done2!">
+      <created>1674479776026</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL‎-00014" />
+      <option name="project" value="LOCAL‎" />
+      <updated>1674479776026</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -228,28 +242,9 @@
     <MESSAGE value="TODO in complieIfWhile" />
     <MESSAGE value="update" />
     <MESSAGE value="another update" />
-    <option name="LAST_COMMIT_MESSAGE" value="another update" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/oop/ex6/main/compiler/CompilationEngine.java</url>
-          <line>460</line>
-          <option name="timeStamp" value="44" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/oop/ex6/main/compiler/CompilationEngine.java</url>
-          <line>348</line>
-          <option name="timeStamp" value="54" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/oop/ex6/main/compiler/CompilationEngine.java</url>
-          <line>596</line>
-          <option name="timeStamp" value="56" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <MESSAGE value="Almost done!" />
+    <MESSAGE value="Almost done2!" />
+    <option name="LAST_COMMIT_MESSAGE" value="Almost done2!" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Sjavac_java$Sjavac.ic" NAME="Sjavac Coverage Results" MODIFIED="1674416260155" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />

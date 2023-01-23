@@ -5,20 +5,14 @@ import java.util.List;
 
 public class CorrectnessChecker {
 
-
+    // names regex
     private static final String VAR_NAME = "^(?!(_(?!\\w)|\\d))\\w+";
-//    private static final String PARAMETERS_DELIMITER = "\\(|,\\s|\\)";
     private static final String METHOD_NAME = "^(?!(_|\\d))\\w+";
-//    private static final String METHOD_PARAMETERS = "\\((\\w+\\s\\w+)(,\\s\\w+\\s\\w+)*\\)";
-//    private static final String SINGLE_PARAMETER_DELIMITER = "\\s";
 
     // if/while regex
     private static final String GENERIC_IF_WHILE_PATTERN = "^\\s*(if|while)\\s*\\(.*\\)\\s*\\{";
-//    private static final String GENERIC_CONDITION_PATTERN = "\\s*\\w+\\s*(((\\|\\|)|(&&))\\s*\\w+\\s*)*";
     private static final String GENERIC_CONDITION_PATTERN = ".+((\\|\\|)?|(&&))*";
     private static final String TRUE_FALSE_PATTERN = "\\s*true|false\\s*";
-    private static final String INITIALIZED_VAR_PATTERN = "\\s*\\w+\\s*";
-//    private static final String VALUE_PATTERN = "\\s*[+-]?((\\d+.?\\d*)|(\\d*.?\\d+))\\s*";
 
     // values regex
     private static final String INT_VALUE = "^[-+]?\\d+";
@@ -31,7 +25,6 @@ public class CorrectnessChecker {
     private static final String COMMENT_START = "//";
     private static final String SPACES = "^\\s+";
     private static final String ONLY_END_SEMICOLON_REGEX = "^[^;]*;\\s*$";
-    private static final String ONLY_END_CURLY_BRACES_REGEX = "^[^{]*\\{\\s*$";
     private static final String FUNCTION_DEC_LINE_REGEX = "^.*\\(.*\\)\\s*\\{\\s*$";
     private static final String FUNCTION_CALL_REGEX = "\\w+.*\\(.*\\)\\s*;\\s*$";
 
@@ -46,7 +39,7 @@ public class CorrectnessChecker {
     private static final String IF = "if";
     private static final String FINAL = "final";
 
-
+    // array of s-javac keywords
     private static final ArrayList<String> DECLARATION_KEYWORDS = new ArrayList<>() {
         {
             add(INT);
@@ -121,34 +114,6 @@ public class CorrectnessChecker {
         return name.matches(METHOD_NAME);
     }
 
-//    /**
-//     * A method that verifies whether the method returns a legal type.
-//     * In the case of the current exercise, the method shouldn't return anything and therefore should have
-//     * void as its returType.
-//     * @param returnType the method return type.
-//     * @return true if correct, false otherwise.
-//     */
-//    public boolean isLegalMethodReturnType(String returnType) {return returnType.equals(VOID);}
-
-//    public boolean legalMethodParameter(String parameter) {
-//        String[] delimitedParameter = parameter.split(SINGLE_PARAMETER_DELIMITER);
-//        String type = delimitedParameter[0];
-//        String name = delimitedParameter[1];
-//        return isLegalVarType(type) && isLegalVarName(name);
-//    }
-
-//    public boolean hasLegalMethodParameters(String parameters) {
-//        if(parameters.matches(METHOD_PARAMETERS)) {
-//            String[] singleParameters = parameters.split(PARAMETERS_DELIMITER);
-//            for(String singleParameter : singleParameters) {
-//                if(!legalMethodParameter(singleParameter))
-//                    return false;
-//            }
-//            return true;
-//        }
-//        return false;
-//    }
-
     /**
      * A method that checks if the line ends legally - with semicolon (;) and has only one semicolon
      * @param line represents the given line
@@ -157,35 +122,54 @@ public class CorrectnessChecker {
     public boolean legalEndOfLine(String line) { return line.matches(ONLY_END_SEMICOLON_REGEX); }
 
     /**
-     * A method that checks if the line ends legally - with { and has only one { in it
-     * @param line represents the given line to check
-     * @return true upos success, false otherwise
+     * checks if a given line is a legal function declaration line
+     * @param line represents the line
+     * @return true if is, false otherwise
      */
-    public boolean legalEndOfIfWhileLine(String line) {return line.matches(ONLY_END_CURLY_BRACES_REGEX);}
-
     public boolean legalFunctionDeclarationLine(String line) {
         return line.matches(FUNCTION_DEC_LINE_REGEX);
     }
 
+    /**
+     * checks if a given line is a legal function call line
+     * @param line represents the line
+     * @return true if is, false otherwise
+     */
     public boolean legalFunctionCall(String line) { return line.matches(FUNCTION_CALL_REGEX); }
 
+    /**
+     * checks if the line has legal if while line pattern
+     * @param line represents the given line
+     * @return true if is, false otherwise
+     */
     public boolean hasLegalIfWhilePattern(String line) {return line.matches(GENERIC_IF_WHILE_PATTERN);}
 
+    /**
+     * checks if a given condition is a legal pattern condition
+     * @param condition represents the condition
+     * @return true if is, false otherwise
+     */
     public boolean hasLegalConditionPattern(String condition) {return condition.matches(GENERIC_CONDITION_PATTERN);}
 
+    /**
+     * Checks if a given condition is a value condition
+     * @param condition represents the condition
+     * @return true if is, false otherwise
+     */
     public boolean hasValueCondition(String condition) {return condition.matches(DOUBLE_VALUE);}
 
+    /**
+     * Checks if a given condition is a true or false condition
+     * @param condition represents the condition
+     * @return true if is, false otherwise
+     */
     public boolean hasTrueFalseCondition(String condition) {return condition.matches(TRUE_FALSE_PATTERN);}
 
-    public boolean hasInitializedVarCondition(String condition) {
-        return condition.matches(INITIALIZED_VAR_PATTERN);
-    }
-
     /**
-     * The method checks if assigner can be assigned to receiver
-     * @param receiver
-     * @param assigner
-     * @return
+     * The method checks if receiver type can be assigned by assigner type
+     * @param receiver represents the receiver type
+     * @param assigner represents the assigner type
+     * @return true if is, false otherwise
      */
     public boolean checkEqualTypes(String receiver, String assigner){
         if (receiver.equals(BOOLEAN) & (assigner.equals(INT) | (assigner.equals(DOUBLE)))) { return true; }
@@ -193,6 +177,12 @@ public class CorrectnessChecker {
         else { return receiver.equals(assigner); }}
     }
 
+    /**
+     * Checks if all the types in the receiver list can be assigned by values from assigners list by order
+     * @param receiverTypeList represents the receiver list
+     * @param assignersTypeList represents the assigners list
+     * @return true if is, false otherwise
+     */
     public boolean checkEqualTypesAll (List<String> receiverTypeList, List<String> assignersTypeList) {
 
         // checking sizes
@@ -207,5 +197,4 @@ public class CorrectnessChecker {
 
     }
 
-//    public boolean checkFunkDeclarationParamList(String line){ }
 }
